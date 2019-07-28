@@ -38,4 +38,4 @@ class File(graphene.ObjectType):
         return get_file_by_id(self.id)
 ```
 
-For more details see examples
+For more details see [examples](examples/entities.py)
