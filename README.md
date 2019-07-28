@@ -37,5 +37,15 @@ class File(graphene.ObjectType):
     def __resolve_reference(self, info, **kwargs):  # https://www.apollographql.com/docs/apollo-server/api/apollo-federation/#__resolvereference
         return get_file_by_id(self.id)
 ```
+```python
+import graphene
+from graphene_federation import build_schema
 
+
+class Query(graphene.ObjectType):
+    ...
+    pass
+
+schema = build_schema(Query)  # add _service{sdl} field in Query
+```
 For more details see [examples](examples/entities.py)
