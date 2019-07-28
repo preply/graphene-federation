@@ -11,3 +11,8 @@ def extend(fields: str):
         setattr(Type, '_sdl', '@key(fields: "%s")' % fields)
         return Type
     return decorator
+
+
+def external(field):
+    field._external = True
+    return field

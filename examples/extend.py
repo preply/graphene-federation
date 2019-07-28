@@ -1,10 +1,10 @@
 import graphene
-from graphene_federation import build_schema, extend
+from graphene_federation import build_schema, extend, external
 
 
 @extend(fields='id')
 class Message(graphene.ObjectType):
-    id = graphene.Int(required=True)
+    id = external(graphene.Int(required=True))
 
     def resolve_id(self, **kwargs):
         return 1
