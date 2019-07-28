@@ -11,11 +11,11 @@ Based on discussion: https://github.com/graphql-python/graphene/issues/953#issue
 Supports now:
 * sdl (_service fields)  # make possible to add schema in federation (as is)
 * @key decorator (entity support) # to perform Queries across service boundaries
-
+* extend  # extend remote types
+* external  # mark field as external 
 
 Todo implement:
 * @requires
-* @external
 * @provides
 
 
@@ -37,6 +37,8 @@ class File(graphene.ObjectType):
     def __resolve_reference(self, info, **kwargs):  # https://www.apollographql.com/docs/apollo-server/api/apollo-federation/#__resolvereference
         return get_file_by_id(self.id)
 ```
+
+
 ```python
 import graphene
 from graphene_federation import build_schema
@@ -48,4 +50,18 @@ class Query(graphene.ObjectType):
 
 schema = build_schema(Query)  # add _service{sdl} field in Query
 ```
-For more details see [examples](examples/entities.py)
+
+
+```python
+import graphene
+from graphene_federation import external, extend
+
+@extend(fields='id')
+class Message(graphene.ObjectType):
+    id = external(graphene.Int(required=True))
+
+    def resolve_id(self, **kwargs):
+        return 1
+
+```
+For more details see [examples](examples/)
