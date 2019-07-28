@@ -6,7 +6,7 @@ https://www.apollographql.com/docs/apollo-server/federation/federation-spec/
 
 Use at your own risk
 
-
+Based on discussion: https://github.com/graphql-python/graphene/issues/953#issuecomment-508481652
 
 Supports now:
 * sdl (_service fields)  # make possible to add schema in federation (as is)
