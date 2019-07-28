@@ -2,6 +2,7 @@ import re
 
 from graphene import ObjectType, String, Field
 
+from graphene_federation.extend import extended_types
 from .entity import custom_entities
 
 
@@ -17,6 +18,12 @@ def get_sdl(schema, custom_entities):
     for entity_name, entity in custom_entities.items():
         type_def = "type " + entity_name
         repl_str = "%s %s" % (type_def, entity._sdl)
+        pattern = re.compile(type_def)
+        string_schema = pattern.sub(repl_str, string_schema)
+
+    for entity_name, entity in extended_types.items():
+        type_def = "type " + entity_name
+        repl_str = "extend %s %s" % (type_def, entity._sdl)
         pattern = re.compile(type_def)
         string_schema = pattern.sub(repl_str, string_schema)
 
