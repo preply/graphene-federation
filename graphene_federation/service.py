@@ -25,18 +25,17 @@ def get_sdl(schema, custom_entities):
     pattern = re.compile(regex)
     string_schema = pattern.sub(" ", string_schema)
 
-    # todo ensure full type name!!!
     for entity_name, entity in custom_entities.items():
-        type_def = "type " + entity_name
-        repl_str = "%s %s" % (type_def, entity._sdl)
+        type_def = "type %s " % entity_name
+        repl_str = "%s %s " % (type_def, entity._sdl)
         pattern = re.compile(type_def)
         string_schema = pattern.sub(repl_str, string_schema)
 
     for entity_name, entity in extended_types.items():
         string_schema = _mark_external(entity_name, entity, string_schema)
 
-        type_def = "type " + entity_name
-        repl_str = "extend %s %s" % (type_def, entity._sdl)
+        type_def = "type %s " % entity_name
+        repl_str = "extend %s %s " % (type_def, entity._sdl)
         pattern = re.compile(type_def)
         string_schema = pattern.sub(repl_str, string_schema)
 
