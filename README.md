@@ -65,3 +65,4 @@ class Message(graphene.ObjectType):
 
 ```
 For more details see [examples](examples/)
+Or check out this cool [example](https://github.com/erebus1/graphene-federation/issues/1) of integration with Mongoengine
