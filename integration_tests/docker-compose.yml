@@ -1,0 +1,9 @@
+version: '3.5'
+services:
+  service_a:
+    build: service_a/.
+
+  federation:
+    build: federation/.
+    depends_on:
+      - service_a

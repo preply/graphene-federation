@@ -1,7 +1,7 @@
 import {ApolloServer} from 'apollo-server'
 import {ApolloGateway} from '@apollo/gateway'
 
-const serviceA_url: string = 'service_a';
+const serviceA_url: string = 'http://service_a:5000/graphql';
 
 const gateway = new ApolloGateway({
     serviceList: [
