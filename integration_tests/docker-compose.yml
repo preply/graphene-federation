@@ -30,7 +30,7 @@ services:
   tests:
     build: tests/.
     volumes:
-      - ./tests:/tests
+      - ./tests:/project/tests
     depends_on:
       - proxy_dep
 #    restart: on-failure
