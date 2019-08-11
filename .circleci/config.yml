@@ -12,11 +12,11 @@ jobs:
       - checkout
 
       - run:
-          name: run build
+          name: Build
           command: cd integration_tests && docker-compose build
 
       - run:
-          name: run tests
+          name: Tests
           command: make test
 
       - store_artifacts:
