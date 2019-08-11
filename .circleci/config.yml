@@ -19,31 +19,10 @@ jobs:
 
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-
-      # Download and cache dependencies
-      - restore_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-
-      - run:
-          name: install dependencies
-          command: |
-            sudo pip install pipenv
-            pipenv install -d
-
-      - save_cache:
-          paths:
-            - ".venv"
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.6/site-packages"
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
 
       - run:
           name: run tests
-          command: |
-            pipenv run pytest
-
+          command: cd integration_tests && docker-compose run tests
 
       - store_artifacts:
           path: test-reports
