@@ -13,7 +13,7 @@ jobs:
 
       - run:
           name: Build
-          command: cd integration_tests && docker-compose build
+          command: make build
 
       - run:
           name: Tests
