@@ -1,0 +1,36 @@
+version: '2.1'
+services:
+  service_a:
+    build: service_a/.
+    volumes:
+      - ./service_a/src:/project/src
+      - ../:/project/federation_deps
+    command: sh -c "pip install ./federation_deps && python ./src/app.py"
+
+  federation:
+    build: federation/.
+    volumes:
+      - ./federation/src:/project/src
+    depends_on:
+      - service_a
+    ports:
+      - 3000:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-XGET", "http://localhost:3000/.well-known/apollo/server-health"]
+      interval: 3s
+      timeout: 10s
+      retries: 5
+
+  proxy_dep:
+    image: busybox
+    depends_on:
+      federation:
+        condition: service_healthy
+
+  tests:
+    build: tests/.
+    volumes:
+      - ./tests:/project/tests
+    depends_on:
+      - proxy_dep
+#    restart: on-failure
