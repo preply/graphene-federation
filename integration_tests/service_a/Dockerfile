@@ -7,7 +7,7 @@ COPY ./ federation_deps/
 RUN pip install -r requirements.txt
 RUN pip install federation_deps/
 
-COPY integration_tests/service_a/src/ integration_tests/service_a/src/
+COPY integration_tests/service_a/src/ ./src/
 
 EXPOSE 5000
-CMD [ "python", "integration_tests/service_a/src/app.py"]
+CMD [ "python", "./src/app.py"]

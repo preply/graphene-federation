@@ -1,4 +1,4 @@
-version: '3.5'
+version: '2.1'
 services:
   service_a:
     build:
@@ -11,3 +11,20 @@ services:
       - service_a
     ports:
       - 3000:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-XGET", "http://localhost:3000/.well-known/apollo/server-health"]
+      interval: 3s
+      timeout: 10s
+      retries: 5
+
+  proxy_dep:
+    image: busybox
+    depends_on:
+      federation:
+        condition: service_healthy
+
+  tests:
+    build: tests/.
+    depends_on:
+      - proxy_dep
+#    restart: on-failure
