@@ -1,17 +1,32 @@
-from graphene import ObjectType, String, Schema
-from graphene_federation import build_schema
+from graphene import ObjectType, String, Int, List, NonNull
+from graphene_federation import build_schema, extend, external
+
+
+@extend(fields='id')
+class FileNode(ObjectType):
+    id = external(Int(required=True))
+
+
+class Post(ObjectType):
+    id = Int(required=True)
+    title = String(required=True)
+    text = String(required=True)
+    files = List(NonNull(FileNode))
+
 
 class Query(ObjectType):
-    # this defines a Field `hello` in our Schema with a single Argument `name`
-    hello = String(name=String(default_value="stranger"))
     goodbye = String()
+    posts = List(NonNull(Post))
 
-    # our Resolver method takes the GraphQL context (root, info) as well as
-    # Argument (name) for the Field and returns data for the query Response
-    def resolve_hello(root, info, name):
-        return f'Hello {name}!'
+    def resolve_posts(root, info):
+        return [
+            Post(id=1, title='title1', text='text1', files=[FileNode(id=1)]),
+            Post(id=2, title='title2', text='text2', files=[FileNode(id=2), FileNode(id=3)]),
+            Post(id=3, title='title3', text='text3'),
+        ]
 
     def resolve_goodbye(root, info):
         return 'See ya!'
 
-schema = build_schema(Query)
+
+schema = build_schema(query=Query)
