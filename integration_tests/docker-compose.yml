@@ -5,7 +5,7 @@ services:
     volumes:
       - ./service_a/src:/project/src
       - ../:/project/federation_deps
-    command: sh -c "pip install -e ./federation_deps && python ./src/app.py"
+    command: sh -c "pip install ./federation_deps && python ./src/app.py"
 
   federation:
     build: federation/.
@@ -29,6 +29,8 @@ services:
 
   tests:
     build: tests/.
+    volumes:
+      - ./tests:/tests
     depends_on:
       - proxy_dep
 #    restart: on-failure
