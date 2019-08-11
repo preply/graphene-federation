@@ -7,12 +7,20 @@ services:
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
 
+  service_b:
+    build: service_b/.
+    volumes:
+      - ./service_b/src:/project/src
+      - ../:/project/federation_deps
+    command: sh -c "pip install ./federation_deps && python ./src/app.py"
+
   federation:
     build: federation/.
     volumes:
       - ./federation/src:/project/src
     depends_on:
       - service_a
+      - service_b
     ports:
       - 3000:3000
     healthcheck:
