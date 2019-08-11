@@ -1,9 +1,13 @@
 version: '3.5'
 services:
   service_a:
-    build: service_a/.
+    build:
+      context: ../
+      dockerfile: ./integration_tests/service_a/Dockerfile
 
   federation:
     build: federation/.
     depends_on:
       - service_a
+    ports:
+      - 3000:3000

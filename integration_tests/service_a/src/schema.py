@@ -1,5 +1,5 @@
 from graphene import ObjectType, String, Schema
-
+from graphene_federation import build_schema
 
 class Query(ObjectType):
     # this defines a Field `hello` in our Schema with a single Argument `name`
@@ -14,4 +14,4 @@ class Query(ObjectType):
     def resolve_goodbye(root, info):
         return 'See ya!'
 
-schema = Schema(query=Query)
+schema = build_schema(Query)
