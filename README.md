@@ -69,4 +69,12 @@ class Message(graphene.ObjectType):
 ```
 For more details see [examples](examples/)
 
-Or check out this cool [example](https://github.com/erebus1/graphene-federation/issues/1) of integration with Mongoengine
+Or better check integration tests [integration_tests](examples/)
+
+Also cool [example](https://github.com/erebus1/graphene-federation/issues/1) of integration with Mongoengine
+
+
+### For contribution:
+#### Run tests:
+* `make test`
+* if you've changed Dockerfile or requirements run `make build` before `make test`
