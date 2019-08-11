@@ -1,9 +1,11 @@
 version: '2.1'
 services:
   service_a:
-    build:
-      context: ../
-      dockerfile: ./integration_tests/service_a/Dockerfile
+    build: service_a/.
+    volumes:
+      - ./service_a/src:/project/src
+      - ../:/project/federation_deps
+    command: sh -c "pip install -e ./federation_deps && python ./src/app.py"
 
   federation:
     build: federation/.

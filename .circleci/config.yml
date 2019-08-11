@@ -13,7 +13,7 @@ jobs:
 
       - run:
           name: run tests
-          command: cd integration_tests && docker-compose run tests
+          command: make test
 
       - store_artifacts:
           path: test-reports
