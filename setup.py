@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setup(
   name = 'graphene-federation',
   packages = ['graphene_federation'],
-  version = '0.0.1',
+  version = '0.0.2',
   license='MIT',
   description = 'Federation implementation for graphene',
   long_description=long_description,
@@ -14,7 +14,7 @@ setup(
   author = 'Igor Kasianov',
   author_email = 'super.hang.glider@gmail.com',
   url = 'https://github.com/erebus1/graphene-federation',
-  download_url = 'https://github.com/erebus1/graphene-federation/archive/0.0.1.tar.gz',
+  download_url = 'https://github.com/erebus1/graphene-federation/archive/0.0.2.tar.gz',
   keywords = ['graphene', 'gql', 'federation'],
   install_requires=[
           "graphene>=2.1.0,<3"
