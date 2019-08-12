@@ -1,7 +1,10 @@
-from distutils.core import setup
+import os
+from setuptools import setup
 
-with open("README.md", "r") as fh:
-  long_description = fh.read()
+
+def read(*rnames):
+  return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
 
 setup(
   name = 'graphene-federation',
@@ -9,8 +12,8 @@ setup(
   version = '0.0.2',
   license='MIT',
   description = 'Federation implementation for graphene',
-  long_description=long_description,
-  long_description_content_type="text/markdown",
+  long_description=(read('README.md')),
+  long_description_content_type='text/markdown',
   author = 'Igor Kasianov',
   author_email = 'super.hang.glider@gmail.com',
   url = 'https://github.com/erebus1/graphene-federation',
