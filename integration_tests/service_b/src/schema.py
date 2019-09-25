@@ -1,5 +1,19 @@
-from graphene import ObjectType, String, Int, Field
+from graphene import ObjectType, String, Int, Field, Interface
 from graphene_federation import build_schema, key
+
+
+class TextInterface(Interface):
+    id = Int(required=True)
+    body = String(required=True)
+
+
+@key(fields='id')
+class FunnyText(ObjectType):
+    class Meta:
+        interfaces = (TextInterface,)
+
+    def __resolve_reference(self, info, **kwargs):
+        return FunnyText(id=self.id, body=f'funny_text_{self.id}')
 
 
 @key(fields='id')
@@ -13,8 +27,7 @@ class FileNode(ObjectType):
 
 
 class Query(ObjectType):
-    # todo support query w/o root fields
     file = Field(lambda: FileNode)
 
 
-schema = build_schema(Query, types=[FileNode])
+schema = build_schema(Query, types=[FileNode, FunnyText])
