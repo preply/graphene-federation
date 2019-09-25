@@ -1,4 +1,4 @@
-from graphene import ObjectType, String, Int, List, NonNull
+from graphene import ObjectType, String, Int, List, NonNull, Field
 from graphene_federation import build_schema, extend, external
 
 
@@ -7,10 +7,15 @@ class FileNode(ObjectType):
     id = external(Int(required=True))
 
 
+@extend(fields='id')
+class FunnyText(ObjectType):
+    id = external(Int(required=True))
+
+
 class Post(ObjectType):
     id = Int(required=True)
     title = String(required=True)
-    text = String(required=True)
+    text = Field(lambda: FunnyText)
     files = List(NonNull(FileNode))
 
 
@@ -20,9 +25,9 @@ class Query(ObjectType):
 
     def resolve_posts(root, info):
         return [
-            Post(id=1, title='title1', text='text1', files=[FileNode(id=1)]),
-            Post(id=2, title='title2', text='text2', files=[FileNode(id=2), FileNode(id=3)]),
-            Post(id=3, title='title3', text='text3'),
+            Post(id=1, title='title1', text=FunnyText(id=1), files=[FileNode(id=1)]),
+            Post(id=2, title='title2', text=FunnyText(id=2), files=[FileNode(id=2), FileNode(id=3)]),
+            Post(id=3, title='title3', text=FunnyText(id=3)),
         ]
 
     def resolve_goodbye(root, info):
