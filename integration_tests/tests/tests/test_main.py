@@ -52,3 +52,24 @@ def test_external_types():
     assert {"id": 2, "body": "funny_text_2"} == posts[1]['text']
     assert posts[2]['files'] is None
     assert {"id": 3, "body": "funny_text_3"} == posts[2]['text']
+
+
+def test_key_decorator_applied_by_exact_match_only():
+    query = {
+        'query': """
+            query {
+                _service {
+                    sdl
+                }
+            }
+        """,
+        'variables': {}
+    }
+    response = requests.post(
+        'http://service_b:5000/graphql',
+        json=query,
+    )
+    assert response.status_code == 200
+    sdl = response.json()['data']['_service']['sdl']
+    assert 'type FileNode  @key(fields: "id")' in sdl
+    assert 'type FileNodeAnother  @key(fields: "id")' not in sdl

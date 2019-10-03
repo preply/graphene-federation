@@ -6,6 +6,11 @@ services:
       - ./service_a/src:/project/src
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
+    healthcheck:
+      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
 
   service_b:
     build: service_b/.
@@ -13,6 +18,11 @@ services:
       - ./service_b/src:/project/src
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
+    healthcheck:
+      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
 
   federation:
     build: federation/.
@@ -28,6 +38,11 @@ services:
       interval: 3s
       timeout: 10s
       retries: 5
+    depends_on:
+      service_a:
+        condition: service_healthy
+      service_b:
+        condition: service_healthy
 
   proxy_dep:
     image: busybox
@@ -41,4 +56,3 @@ services:
       - ./tests:/project/tests
     depends_on:
       - proxy_dep
-#    restart: on-failure
