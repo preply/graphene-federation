@@ -26,7 +26,7 @@ def get_sdl(schema, custom_entities):
     string_schema = pattern.sub(" ", string_schema)
 
     for entity_name, entity in custom_entities.items():
-        type_def_re = r"(type %s[^\{]*)" % entity_name
+        type_def_re = r"(type %s [^\{]*)" % entity_name
         repl_str = r"\1 %s " % entity._sdl
         pattern = re.compile(type_def_re)
         string_schema = pattern.sub(repl_str, string_schema)
