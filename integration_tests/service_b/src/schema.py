@@ -26,8 +26,14 @@ class FileNode(ObjectType):
         return FileNode(id=self.id, name=f'file_{self.id}')
 
 
+# to test that @key applied only to FileNode, but not to FileNodeAnother
+class FileNodeAnother(ObjectType):
+    id = Int(required=True)
+    name = String(required=True)
+
+
 class Query(ObjectType):
     file = Field(lambda: FileNode)
 
 
-schema = build_schema(Query, types=[FileNode, FunnyText])
+schema = build_schema(Query, types=[FileNode, FunnyText, FileNodeAnother])
