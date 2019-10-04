@@ -15,9 +15,9 @@ def _get_query(schema, query_cls):
     return federated_query_cls
 
 
-def build_schema(query, **kwargs):
-    schema = graphene.Schema(query=query, **kwargs)
-    return graphene.Schema(query=_get_query(schema, query), **kwargs)
+def build_schema(query, mutation=None, **kwargs):
+    schema = graphene.Schema(query=query, mutation=mutation, **kwargs)
+    return graphene.Schema(query=_get_query(schema, query), mutation=mutation, **kwargs)
 
 
 def key(fields: str):
