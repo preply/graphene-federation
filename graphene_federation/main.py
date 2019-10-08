@@ -20,9 +20,11 @@ def build_schema(query, mutation=None, **kwargs):
     return graphene.Schema(query=_get_query(schema, query), mutation=mutation, **kwargs)
 
 
-def key(fields: str):
+def key(fields: str, *args: str):
     def decorator(Type):
         register_entity(Type.__name__, Type)
-        setattr(Type, '_sdl', '@key(fields: "%s")' % fields)
+        keys = [fields] + list(args)
+        sdl = " ".join(['@key(fields: "%s")' % key for key in keys])
+        setattr(Type, '_sdl', sdl)
         return Type
     return decorator

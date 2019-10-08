@@ -31,6 +31,10 @@ def test_external_types():
                        id
                        name
                     }
+                    author {
+                        id
+                        email
+                    }
                 }
             }
         """,
@@ -42,16 +46,19 @@ def test_external_types():
     )
     assert response.status_code == 200
     posts = json.loads(response.content)['data']['posts']
-    assert 3 == len(posts)
-    assert [{'id': 1, 'name': 'file_1'}] == posts[0]['files']
-    assert {'id': 1, 'body': 'funny_text_1'} == posts[0]['text']
-    assert [{'id': 2, 'name': 'file_2'}, {'id': 3, 'name': 'file_3'}] == posts[1]['files']
-    assert {'id': 2, 'body': 'funny_text_2'} == posts[1]['text']
+    assert 4 == len(posts)
+    assert [{"id": 1, "name": "file_1"}] == posts[0]['files']
+    assert {"id": 1, "body": "funny_text_1"} == posts[0]['text']
+    assert [{"id": 2, "name": "file_2"}, {"id": 3, "name": "file_3"}] == posts[1]['files']
+    assert {"id": 2, "body": "funny_text_2"} == posts[1]['text']
     assert posts[2]['files'] is None
-    assert {'id': 3, 'body': 'funny_text_3'} == posts[2]['text']
+    assert {"id": 3, "body": "funny_text_3"} == posts[2]['text']
+    assert posts[3]["author"] is not None
+    author = posts[3]["author"]
+    assert {"id": 1001, "email": "frank@frank.com", } == author
 
 
-def test_key_decorator_applied_by_exact_match_only():
+def fetch_sdl():
     query = {
         'query': """
             query {
@@ -64,7 +71,11 @@ def test_key_decorator_applied_by_exact_match_only():
     }
     response = requests.post('http://service_b:5000/graphql', json=query)
     assert response.status_code == 200
-    sdl = response.json()['data']['_service']['sdl']
+    return response.json()['data']['_service']['sdl']
+
+
+def test_key_decorator_applied_by_exact_match_only():
+    sdl = fetch_sdl()
     assert 'type FileNode  @key(fields: "id")' in sdl
     assert 'type FileNodeAnother  @key(fields: "id")' not in sdl
 
@@ -85,3 +96,7 @@ def test_mutation_is_accessible_in_federation():
     assert 'errors' not in response.json()
     assert response.json()['data']['funnyMutation']['result'] == 'Funny'
 
+
+def test_multiple_key_decorators_apply_multiple_key_annotations():
+    sdl = fetch_sdl()
+    assert 'type User  @key(fields: "id") @key(fields: "email")' in sdl
