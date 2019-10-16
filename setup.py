@@ -5,11 +5,12 @@ from setuptools import setup
 def read(*rnames):
   return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
+version = '0.0.3'
 
 setup(
   name = 'graphene-federation',
   packages = ['graphene_federation'],
-  version = '0.0.3',
+  version = version,
   license='MIT',
   description = 'Federation implementation for graphene',
   long_description=(read('README.md')),
@@ -17,7 +18,7 @@ setup(
   author = 'Igor Kasianov',
   author_email = 'super.hang.glider@gmail.com',
   url = 'https://github.com/erebus1/graphene-federation',
-  download_url = 'https://github.com/erebus1/graphene-federation/archive/0.0.2.tar.gz',
+  download_url = f'https://github.com/erebus1/graphene-federation/archive/{version}.tar.gz',
   keywords = ['graphene', 'gql', 'federation'],
   install_requires=[
           "graphene>=2.1.0,<3"
