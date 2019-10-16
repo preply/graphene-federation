@@ -9,7 +9,7 @@ def read(*rnames):
 setup(
   name = 'graphene-federation',
   packages = ['graphene_federation'],
-  version = '0.0.2',
+  version = '0.0.3',
   license='MIT',
   description = 'Federation implementation for graphene',
   long_description=(read('README.md')),
@@ -23,7 +23,7 @@ setup(
           "graphene>=2.1.0,<3"
       ],
   classifiers=[
-    'Development Status :: 3 - Alpha',
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries",
     "Programming Language :: Python :: 3.6",
