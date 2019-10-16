@@ -17,7 +17,6 @@ setup(
   author = 'Igor Kasianov',
   author_email = 'super.hang.glider@gmail.com',
   url = 'https://github.com/erebus1/graphene-federation',
-  download_url = 'https://github.com/erebus1/graphene-federation/archive/0.0.3.tar.gz',
   keywords = ['graphene', 'gql', 'federation'],
   install_requires=[
           "graphene>=2.1.0,<3"
