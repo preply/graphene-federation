@@ -1,4 +1,4 @@
-from graphene import ObjectType, String, Int, Field, Interface
+from graphene import ObjectType, String, Int, Field, Interface, Mutation
 from graphene_federation import build_schema, key
 
 
@@ -36,4 +36,16 @@ class Query(ObjectType):
     file = Field(lambda: FileNode)
 
 
-schema = build_schema(Query, types=[FileNode, FunnyText, FileNodeAnother])
+class FunnyMutation(Mutation):
+    result = String(required=True)
+
+    @classmethod
+    def mutate(cls, root, info, **data):
+        return FunnyMutation(result='Funny')
+
+
+class Mutation(ObjectType):
+    funny_mutation = FunnyMutation.Field()
+
+
+schema = build_schema(Query, Mutation, types=[FileNode, FunnyText, FileNodeAnother])
