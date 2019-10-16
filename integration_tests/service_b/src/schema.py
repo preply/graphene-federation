@@ -7,7 +7,7 @@ class TextInterface(Interface):
     body = String(required=True)
 
 
-@key(fields="id")
+@key(fields='id')
 class FunnyText(ObjectType):
     class Meta:
         interfaces = (TextInterface,)
