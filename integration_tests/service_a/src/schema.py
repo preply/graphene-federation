@@ -21,6 +21,18 @@ class FunnyText(ObjectType):
         return self.id + 2
 
 
+class FunnyTextAnother(ObjectType):
+    """
+    To test @extend on types with same prefix
+    """
+    class Meta:
+        interfaces = (DecoratedText,)
+    id = Int(required=True)
+
+    def resolve_color(self, info, **kwargs):
+        return self.id + 2
+
+
 class Post(ObjectType):
     id = Int(required=True)
     title = String(required=True)
@@ -43,4 +55,4 @@ class Query(ObjectType):
         return 'See ya!'
 
 
-schema = build_schema(query=Query)
+schema = build_schema(query=Query, types=[FunnyTextAnother])

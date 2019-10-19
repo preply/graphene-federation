@@ -35,7 +35,7 @@ def get_sdl(schema, custom_entities):
     for entity_name, entity in extended_types.items():
         string_schema = _mark_external(entity_name, entity, string_schema)
 
-        type_def_re = r"type %s([^\{]*)" % entity_name
+        type_def_re = r"type %s ([^\{]*)" % entity_name
         type_def = r"type %s " % entity_name
         repl_str = r"extend %s \1 %s " % (type_def, entity._sdl)
         pattern = re.compile(type_def_re)
