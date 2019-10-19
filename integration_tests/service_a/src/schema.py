@@ -20,9 +20,6 @@ class FunnyText(ObjectType):
     def resolve_color(self, info, **kwargs):
         return self.id + 2
 
-    def __resolve_reference(self, info, **kwargs):
-        return FunnyText(id=self.id)
-
 
 class Post(ObjectType):
     id = Int(required=True)
