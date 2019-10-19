@@ -1,5 +1,9 @@
-from graphene import ObjectType, String, Int, List, NonNull, Field
+from graphene import ObjectType, String, Int, List, NonNull, Field, Interface
 from graphene_federation import build_schema, extend, external
+
+
+class DecoratedText(Interface):
+    color = Int(required=True)
 
 
 @extend(fields='id')
@@ -9,7 +13,15 @@ class FileNode(ObjectType):
 
 @extend(fields='id')
 class FunnyText(ObjectType):
+    class Meta:
+        interfaces = (DecoratedText,)
     id = external(Int(required=True))
+
+    def resolve_color(self, info, **kwargs):
+        return self.id + 2
+
+    def __resolve_reference(self, info, **kwargs):
+        return FunnyText(id=self.id)
 
 
 class Post(ObjectType):

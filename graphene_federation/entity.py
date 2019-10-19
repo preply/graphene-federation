@@ -30,6 +30,7 @@ def get_entity_query():
             entities = []
             for representation in representations:
                 model = custom_entities[representation["__typename"]]
+                # todo if no resolver defined?
                 resolver = getattr(model, "_%s__resolve_reference" % representation["__typename"])
                 model_aguments = representation.copy()
                 model_aguments.pop("__typename")
