@@ -26,7 +26,8 @@ class FileNode(ObjectType):
         return FileNode(id=self.id, name=f'file_{self.id}')
 
 
-@key('id', 'email')
+@key('id')
+@key('email')
 class User(ObjectType):
     id = Int(required=True)
     email = String()

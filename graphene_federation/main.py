@@ -20,11 +20,15 @@ def build_schema(query, mutation=None, **kwargs):
     return graphene.Schema(query=_get_query(schema, query), mutation=mutation, **kwargs)
 
 
-def key(fields: str, *args: str):
+def key(fields: str):
     def decorator(Type):
         register_entity(Type.__name__, Type)
-        keys = [fields] + list(args)
-        sdl = " ".join(['@key(fields: "%s")' % key for key in keys])
-        setattr(Type, '_sdl', sdl)
+
+        existing = getattr(Type, "_sdl", "")
+
+        key_sdl = f'@key(fields: "{fields}")'
+        updated = f"{key_sdl} {existing}" if len(existing) > 0 else key_sdl
+
+        setattr(Type, '_sdl', updated)
         return Type
     return decorator
