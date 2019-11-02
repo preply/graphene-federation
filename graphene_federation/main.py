@@ -27,7 +27,7 @@ def key(fields: str):
         existing = getattr(Type, "_sdl", "")
 
         key_sdl = f'@key(fields: "{fields}")'
-        updated = f"{key_sdl} {existing}" if len(existing) > 0 else key_sdl
+        updated = f"{key_sdl} {existing}" if existing else key_sdl
 
         setattr(Type, '_sdl', updated)
         return Type
