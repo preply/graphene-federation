@@ -51,13 +51,6 @@ class Query(ObjectType):
     file = Field(lambda: FileNode)
 
 
-types = [
-    FileNode,
-    FunnyText,
-    FileNodeAnother,
-    User
-]
-
 class FunnyMutation(Mutation):
     result = String(required=True)
 
