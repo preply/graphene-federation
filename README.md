@@ -13,7 +13,20 @@ Based on discussion: https://github.com/graphql-python/graphene/issues/953#issue
 
 Supports now:
 * sdl (_service fields)  # make possible to add schema in federation (as is)
-* @key decorator (entity support) # to perform Queries across service boundaries
+* `@key` decorator (entity support) # to perform Queries across service boundaries
+    *  You can use multiple `@key` per each ObjectType
+    ```python
+        @key('id')
+        @key('email')
+        class User(ObjectType):
+            id = Int(required=True)
+            email = String()
+        
+            def __resolve_reference(self, info, **kwargs):
+                if self.id is not None:
+                    return User(id=self.id, email=f'name_{self.id}@gmail.com')
+                return User(id=123, email=self.email)              
+    ```
 * extend  # extend remote types
 * external  # mark field as external 
 
