@@ -70,7 +70,7 @@ class Message(graphene.ObjectType):
 
 ### __resolve_reference
 * Each type which is decorated with `@key` or `@extend` is added to `_Entity` union
-* `__resolve_reference` method can be defined for each type that is an entity. This method is called whenever an entity is requested as part of the fufilling a query plan.
+* `__resolve_reference` method can be defined for each type that is an entity. This method is called whenever an entity is requested as part of the fulfilling a query plan.
 If not explicitly defined, default resolver is used. Default resolver just creates instance of type with passed fieldset as kwargs, see [`entity.get_entity_query`](graphene_federation/entity.py) for more details
 * You should define `__resolve_reference`, if you need to extract object before passing it to fields resolvers (example: [FileNode](integration_tests/service_b/src/schema.py))
 * You should not define `__resolve_reference`, if fileds resolvers need only data passed in fieldset (example: [FunnyText](integration_tests/service_a/src/schema.py))
