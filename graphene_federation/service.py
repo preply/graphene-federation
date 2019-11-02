@@ -11,8 +11,9 @@ def _mark_external(entity_name, entity, schema):
         field = getattr(entity, field_name, None)
         if field is not None and getattr(field, '_external', False):
             # todo write tests on regexp
-            pattern = re.compile("(\s%s\s*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (entity_name, field_name))
-            schema = pattern.sub('\g<1> @external ', schema)
+            pattern = re.compile(
+                r"(\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (entity_name, field_name))
+            schema = pattern.sub(r'\g<1> @external ', schema)
 
     return schema
 
@@ -34,9 +35,11 @@ def get_sdl(schema, custom_entities):
     for entity_name, entity in extended_types.items():
         string_schema = _mark_external(entity_name, entity, string_schema)
 
-        type_def = "type %s " % entity_name
-        repl_str = "extend %s %s " % (type_def, entity._sdl)
-        pattern = re.compile(type_def)
+        type_def_re = r"type %s ([^\{]*)" % entity_name
+        type_def = r"type %s " % entity_name
+        repl_str = r"extend %s \1 %s " % (type_def, entity._sdl)
+        pattern = re.compile(type_def_re)
+
         string_schema = pattern.sub(repl_str, string_schema)
 
     return string_schema
