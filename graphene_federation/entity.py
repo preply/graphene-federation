@@ -30,13 +30,19 @@ def get_entity_query():
             entities = []
             for representation in representations:
                 model = custom_entities[representation["__typename"]]
-                resolver = getattr(model, "_%s__resolve_reference" % representation["__typename"])
                 model_aguments = representation.copy()
                 model_aguments.pop("__typename")
+                model_instance = model(**model_aguments)
 
-                entities.append(
-                    resolver(model(**model_aguments), info)
-                )
+                try:
+                    resolver = getattr(
+                        model, "_%s__resolve_reference" % representation["__typename"])
+                except AttributeError:
+                    pass
+                else:
+                    model_instance = resolver(model_instance, info)
+
+                entities.append(model_instance)
             return entities
 
     return EntityQuery
