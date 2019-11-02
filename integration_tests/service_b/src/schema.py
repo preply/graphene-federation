@@ -26,14 +26,25 @@ class FileNode(ObjectType):
         return FileNode(id=self.id, name=f'file_{self.id}')
 
 
+@key('id')
+@key('email')
+class User(ObjectType):
+    id = Int(required=True)
+    email = String()
+
+    def __resolve_reference(self, info, **kwargs):
+        if self.id is not None:
+            return User(id=self.id, email=f'name_{self.id}@gmail.com')
+
+        user_id = 1001 if self.email == "frank@frank.com" else hash(self.email) % 10000000
+
+        return User(id=user_id, email=self.email)
+
+
 # to test that @key applied only to FileNode, but not to FileNodeAnother
 class FileNodeAnother(ObjectType):
     id = Int(required=True)
     name = String(required=True)
-
-
-class Query(ObjectType):
-    file = Field(lambda: FileNode)
 
 
 class FunnyMutation(Mutation):
@@ -48,4 +59,15 @@ class Mutation(ObjectType):
     funny_mutation = FunnyMutation.Field()
 
 
-schema = build_schema(Query, Mutation, types=[FileNode, FunnyText, FileNodeAnother])
+class Query(ObjectType):
+    file = Field(lambda: FileNode)
+
+
+types = [
+    FileNode,
+    FunnyText,
+    FileNodeAnother,
+    User
+]
+
+schema = build_schema(Query, Mutation, types=types)

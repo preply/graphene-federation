@@ -23,6 +23,12 @@ def build_schema(query, mutation=None, **kwargs):
 def key(fields: str):
     def decorator(Type):
         register_entity(Type.__name__, Type)
-        setattr(Type, '_sdl', '@key(fields: "%s")' % fields)
+
+        existing = getattr(Type, "_sdl", "")
+
+        key_sdl = f'@key(fields: "{fields}")'
+        updated = f"{key_sdl} {existing}" if existing else key_sdl
+
+        setattr(Type, '_sdl', updated)
         return Type
     return decorator

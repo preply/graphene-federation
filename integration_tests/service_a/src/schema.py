@@ -33,11 +33,17 @@ class FunnyTextAnother(ObjectType):
         return self.id + 2
 
 
+@extend(fields='email')
+class User(ObjectType):
+    email = external(String())
+
+
 class Post(ObjectType):
     id = Int(required=True)
     title = String(required=True)
     text = Field(lambda: FunnyText)
     files = List(NonNull(FileNode))
+    author = Field(lambda: User)
 
 
 class Query(ObjectType):
@@ -49,6 +55,7 @@ class Query(ObjectType):
             Post(id=1, title='title1', text=FunnyText(id=1), files=[FileNode(id=1)]),
             Post(id=2, title='title2', text=FunnyText(id=2), files=[FileNode(id=2), FileNode(id=3)]),
             Post(id=3, title='title3', text=FunnyText(id=3)),
+            Post(id=4, title='title4', text=FunnyText(id=4), author=User(email="frank@frank.com")),
         ]
 
     def resolve_goodbye(root, info):
