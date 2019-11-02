@@ -47,10 +47,6 @@ class FileNodeAnother(ObjectType):
     name = String(required=True)
 
 
-class Query(ObjectType):
-    file = Field(lambda: FileNode)
-
-
 class FunnyMutation(Mutation):
     result = String(required=True)
 
