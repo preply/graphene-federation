@@ -48,7 +48,7 @@ def test_external_types():
     assert response.status_code == 200
     posts = json.loads(response.content)['data']['posts']
 
-    assert 3 == len(posts)
+    assert 4 == len(posts)
     assert [{'id': 1, 'name': 'file_1'}] == posts[0]['files']
     assert {'id': 1, 'body': 'funny_text_1', 'color': 3} == posts[0]['text']
     assert [{'id': 2, 'name': 'file_2'}, {'id': 3, 'name': 'file_3'}] == posts[1]['files']
