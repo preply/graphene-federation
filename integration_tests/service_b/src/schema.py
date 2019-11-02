@@ -33,8 +33,8 @@ class User(ObjectType):
     email = String()
 
     def __resolve_reference(self, info, **kwargs):
-        if hasattr(info, 'id'):
-            return User(id=self.id, email=f'name_{self.id}')
+        if self.id is not None:
+            return User(id=self.id, email=f'name_{self.id}@gmail.com')
 
         user_id = 1001 if self.email == "frank@frank.com" else hash(self.email) % 10000000
 

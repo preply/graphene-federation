@@ -37,6 +37,14 @@ def test_external_types():
                         email
                     }
                 }
+                articles {
+                    id
+                    text
+                    author {
+                        id
+                        email
+                    }
+                }
             }
         """,
         'variables': {}
@@ -46,7 +54,9 @@ def test_external_types():
         json=query,
     )
     assert response.status_code == 200
-    posts = json.loads(response.content)['data']['posts']
+    data = json.loads(response.content)['data']
+    posts = data['posts']
+    articles = data['articles']
 
     assert 4 == len(posts)
     assert [{'id': 1, 'name': 'file_1'}] == posts[0]['files']
@@ -56,6 +66,9 @@ def test_external_types():
     assert posts[2]['files'] is None
     assert {'id': 3, 'body': 'funny_text_3', 'color': 5} == posts[2]['text']
     assert {'id': 1001, 'email': 'frank@frank.com', } == posts[3]['author']
+
+    assert articles == [
+        {'id': 1, 'text': 'some text', 'author': {'id': 5, 'email': 'name_5@gmail.com'}}]
 
 
 def fetch_sdl():
