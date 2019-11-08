@@ -4,10 +4,8 @@ Federation support for graphene
 Build: [![CircleCI](https://circleci.com/gh/erebus1/graphene-federation.svg?style=svg)](https://circleci.com/gh/erebus1/graphene-federation)
 
 
-Draft version, of federation specs implementation on top of Python graphene lib 
+Federation specs implementation on top of Python graphene lib 
 https://www.apollographql.com/docs/apollo-server/federation/federation-spec/
-
-Use at your own risk
 
 Based on discussion: https://github.com/graphql-python/graphene/issues/953#issuecomment-508481652
 
