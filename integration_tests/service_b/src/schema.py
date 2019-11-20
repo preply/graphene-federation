@@ -27,18 +27,19 @@ class FileNode(ObjectType):
 
 
 @key('id')
-@key('email')
+@key('primaryEmail')  # todo
 class User(ObjectType):
     id = Int(required=True)
-    email = String()
+    primary_email = String()
 
     def __resolve_reference(self, info, **kwargs):
         if self.id is not None:
-            return User(id=self.id, email=f'name_{self.id}@gmail.com')
+            return User(id=self.id, primary_email=f'name_{self.id}@gmail.com')
 
-        user_id = 1001 if self.email == "frank@frank.com" else hash(self.email) % 10000000
+        user_id = 1001 if self.primary_email == "frank@frank.com" else \
+            hash(self.primary_email) % 10000000
 
-        return User(id=user_id, email=self.email)
+        return User(id=user_id, primary_email=self.primary_email)
 
 
 # to test that @key applied only to FileNode, but not to FileNodeAnother

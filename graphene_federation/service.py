@@ -1,6 +1,7 @@
 import re
 
 from graphene import ObjectType, String, Field
+from graphene.utils.str_converters import to_camel_case
 
 from graphene_federation.extend import extended_types
 from .entity import custom_entities
@@ -12,7 +13,8 @@ def _mark_external(entity_name, entity, schema):
         if field is not None and getattr(field, '_external', False):
             # todo write tests on regexp
             pattern = re.compile(
-                r"(\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (entity_name, field_name))
+                r"(\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
+                    entity_name, to_camel_case(field_name)))
             schema = pattern.sub(r'\g<1> @external ', schema)
 
     return schema

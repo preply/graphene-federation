@@ -1,4 +1,5 @@
 from graphene import List, Union
+from graphene.utils.str_converters import to_snake_case
 
 import graphene
 
@@ -31,10 +32,9 @@ def get_entity_query():
             for representation in representations:
                 model = custom_entities[representation["__typename"]]
                 model_aguments = representation.copy()
-                # todo convert camel case
 
                 model_aguments.pop("__typename")
-                model_instance = model(**model_aguments)
+                model_instance = model(**{to_snake_case(k): v for k, v in model_aguments.items()})
 
                 try:
                     resolver = getattr(

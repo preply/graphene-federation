@@ -34,7 +34,7 @@ def test_external_types():
                     }
                     author {
                         id
-                        email
+                        primaryEmail
                     }
                 }
                 articles {
@@ -42,7 +42,7 @@ def test_external_types():
                     text
                     author {
                         id
-                        email
+                        primaryEmail
                     }
                 }
             }
@@ -65,10 +65,10 @@ def test_external_types():
     assert {'id': 2, 'body': 'funny_text_2', 'color': 4} == posts[1]['text']
     assert posts[2]['files'] is None
     assert {'id': 3, 'body': 'funny_text_3', 'color': 5} == posts[2]['text']
-    assert {'id': 1001, 'email': 'frank@frank.com', } == posts[3]['author']
+    assert {'id': 1001, 'primaryEmail': 'frank@frank.com', } == posts[3]['author']
 
     assert articles == [
-        {'id': 1, 'text': 'some text', 'author': {'id': 5, 'email': 'name_5@gmail.com'}}]
+        {'id': 1, 'text': 'some text', 'author': {'id': 5, 'primaryEmail': 'name_5@gmail.com'}}]
 
 
 def fetch_sdl(service_name='service_b'):
@@ -112,7 +112,7 @@ def test_mutation_is_accessible_in_federation():
 
 def test_multiple_key_decorators_apply_multiple_key_annotations():
     sdl = fetch_sdl()
-    assert 'type User  @key(fields: "id") @key(fields: "email")' in sdl
+    assert 'type User  @key(fields: "id") @key(fields: "primaryEmail")' in sdl
 
 
 def test_avoid_duplication_of_key_decorator():
