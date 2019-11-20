@@ -1,4 +1,5 @@
 from graphene import List, Union
+from graphene.utils.str_converters import to_snake_case
 
 import graphene
 
@@ -32,7 +33,8 @@ def get_entity_query():
                 model = custom_entities[representation["__typename"]]
                 model_aguments = representation.copy()
                 model_aguments.pop("__typename")
-                model_instance = model(**model_aguments)
+                # todo use schema to identify correct mapping for field names
+                model_instance = model(**{to_snake_case(k): v for k, v in model_aguments.items()})
 
                 try:
                     resolver = getattr(
