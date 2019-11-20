@@ -33,6 +33,7 @@ def get_entity_query():
                 model = custom_entities[representation["__typename"]]
                 model_aguments = representation.copy()
                 model_aguments.pop("__typename")
+                # todo use schema to identify correct mapping for field names
                 model_instance = model(**{to_snake_case(k): v for k, v in model_aguments.items()})
 
                 try:
