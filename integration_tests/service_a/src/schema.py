@@ -35,7 +35,7 @@ class FunnyTextAnother(ObjectType):
 
 @extend(fields='primaryEmail')
 class User(ObjectType):
-    primary_email = external(String())
+    primaryEmail = external(String())
 
 
 class Post(ObjectType):
@@ -57,7 +57,7 @@ class Query(ObjectType):
             Post(id=3, title='title3', text=FunnyText(id=3)),
             Post(
                 id=4, title='title4', text=FunnyText(id=4),
-                author=User(primary_email="frank@frank.com")
+                author=User(primaryEmail="frank@frank.com")
             ),
         ]
 
@@ -65,4 +65,4 @@ class Query(ObjectType):
         return 'See ya!'
 
 
-schema = build_schema(query=Query, types=[FunnyTextAnother])
+schema = build_schema(query=Query, types=[FunnyTextAnother], auto_camelcase=False)

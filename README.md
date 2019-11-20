@@ -91,8 +91,8 @@ If not explicitly defined, default resolver is used. Default resolver just creat
 
 ### Known issues:
 1. decorators will not work properly
-* on `camel_case` fields if you're using `auto_camelcase=False`
-* on fields with custom names for example `some_field = String(name='another_name')`  
+* on fields with capitalised letters with `auto_camelcase=True`, for example: `my_ABC_field = String()`
+* on fields with custom names for example `some_field = String(name='another_name')`
 
 ---------------------------
 
