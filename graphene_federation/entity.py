@@ -31,6 +31,8 @@ def get_entity_query():
             for representation in representations:
                 model = custom_entities[representation["__typename"]]
                 model_aguments = representation.copy()
+                # todo convert camel case
+
                 model_aguments.pop("__typename")
                 model_instance = model(**model_aguments)
 

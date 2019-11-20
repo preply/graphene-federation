@@ -16,6 +16,8 @@ def _get_query(schema, query_cls):
 
 
 def build_schema(query, mutation=None, **kwargs):
+    # todo make query nullable
+    # todo handle if query is None
     schema = graphene.Schema(query=query, mutation=mutation, **kwargs)
     return graphene.Schema(query=_get_query(schema, query), mutation=mutation, **kwargs)
 
