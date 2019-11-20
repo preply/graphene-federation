@@ -59,10 +59,6 @@ class Mutation(ObjectType):
     funny_mutation = FunnyMutation.Field()
 
 
-class Query(ObjectType):
-    file = Field(lambda: FileNode)
-
-
 types = [
     FileNode,
     FunnyText,
@@ -70,4 +66,4 @@ types = [
     User
 ]
 
-schema = build_schema(Query, Mutation, types=types)
+schema = build_schema(mutation=Mutation, types=types)
