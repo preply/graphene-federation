@@ -71,7 +71,7 @@ def test_external_types():
         {'id': 1, 'text': 'some text', 'author': {'id': 5, 'email': 'name_5@gmail.com'}}]
 
 
-def fetch_sdl():
+def fetch_sdl(service_name='service_b'):
     query = {
         'query': """
             query {
@@ -82,7 +82,7 @@ def fetch_sdl():
         """,
         'variables': {}
     }
-    response = requests.post('http://service_b:5000/graphql', json=query)
+    response = requests.post(f'http://{service_name}:5000/graphql', json=query)
     assert response.status_code == 200
     return response.json()['data']['_service']['sdl']
 
@@ -113,3 +113,8 @@ def test_mutation_is_accessible_in_federation():
 def test_multiple_key_decorators_apply_multiple_key_annotations():
     sdl = fetch_sdl()
     assert 'type User  @key(fields: "id") @key(fields: "email")' in sdl
+
+
+def test_avoid_duplication_of_key_decorator():
+    sdl = fetch_sdl('service_a')
+    assert 'extend type FileNode   @key(fields: \"id\") {' in sdl

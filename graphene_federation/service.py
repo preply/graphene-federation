@@ -37,7 +37,7 @@ def get_sdl(schema, custom_entities):
 
         type_def_re = r"type %s ([^\{]*)" % entity_name
         type_def = r"type %s " % entity_name
-        repl_str = r"extend %s \1 %s " % (type_def, entity._sdl)
+        repl_str = r"extend %s \1" % type_def
         pattern = re.compile(type_def_re)
 
         string_schema = pattern.sub(repl_str, string_schema)
@@ -46,13 +46,13 @@ def get_sdl(schema, custom_entities):
 
 
 def get_service_query(schema):
-    sdl = get_sdl(schema, custom_entities)
+    sdl_str = get_sdl(schema, custom_entities)
 
     class _Service(ObjectType):
         sdl = String()
 
         def resolve_sdl(parent, _):
-            return sdl
+            return sdl_str
 
     class ServiceQuery(ObjectType):
         _service = Field(_Service, name="_service")
