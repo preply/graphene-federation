@@ -88,6 +88,14 @@ If not explicitly defined, default resolver is used. Default resolver just creat
 * read more in [official documentation](https://www.apollographql.com/docs/apollo-server/api/apollo-federation/#__resolvereference)
 ------------------------
 
+
+### Known issues:
+1. decorators will not work properly
+* on `camel_case` fields if you're using `auto_camelcase=False`
+* on fields with custom names for example `some_field = String(name='another_name')`  
+
+---------------------------
+
 For more details see [examples](examples/)
 
 Or better check [integration_tests](integration_tests/)
