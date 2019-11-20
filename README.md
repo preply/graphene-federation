@@ -1,7 +1,7 @@
 # graphene-federation
 Federation support for graphene
 
-Build: [![CircleCI](https://circleci.com/gh/erebus1/graphene-federation.svg?style=svg)](https://circleci.com/gh/erebus1/graphene-federation)
+Build: [![CircleCI](https://circleci.com/gh/preply/graphene-federation.svg?style=svg)](https://circleci.com/gh/erebus1/graphene-federation)
 
 
 Federation specs implementation on top of Python graphene lib 
