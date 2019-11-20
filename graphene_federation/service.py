@@ -12,10 +12,10 @@ def _mark_external(entity_name, entity, schema, auto_camelcase):
         field = getattr(entity, field_name, None)
         if field is not None and getattr(field, '_external', False):
             # todo write tests on regexp
-            field_name = to_camel_case(field_name) if auto_camelcase else field_name
+            schema_field_name = to_camel_case(field_name) if auto_camelcase else field_name
             pattern = re.compile(
                 r"(\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
-                    entity_name, field_name))
+                    entity_name, schema_field_name))
             schema = pattern.sub(r'\g<1> @external ', schema)
 
     return schema
