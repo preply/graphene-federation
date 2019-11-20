@@ -7,7 +7,6 @@ def register_extend_type(typename, Type):
 
 
 def extend(fields: str):
-    # todo convert snake to camel
     def decorator(Type):
         if hasattr(Type, '_sdl'):
             raise RuntimeError("Can't extend type which is already extended or has @key")
