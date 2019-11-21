@@ -1,10 +1,15 @@
 from graphene import ObjectType, String, Int, List, NonNull, Field
-from graphene_federation import build_schema, extend, external
+from graphene_federation import build_schema, extend, external, requires
 
 
 @extend(fields='id')
 class User(ObjectType):
     id = external(Int(required=True))
+    primary_email = external(String())
+    uppercase_email = requires(String(), fields='primaryEmail')
+
+    def resolve_uppercase_email(self, info):
+        return self.primary_email.upper() if self.primary_email else self.primary_email
 
 
 class Article(ObjectType):

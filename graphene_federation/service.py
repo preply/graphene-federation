@@ -7,18 +7,32 @@ from graphene_federation.extend import extended_types
 from .entity import custom_entities
 
 
-def _mark_external(entity_name, entity, schema, auto_camelcase):
+def _mark_field(
+        entity_name, entity, schema: str, mark_name: str, decorator: callable, auto_camelcase: bool
+):
     for field_name in dir(entity):
         field = getattr(entity, field_name, None)
-        if field is not None and getattr(field, '_external', False):
+        if field is not None and getattr(field, mark_name, None):
             # todo write tests on regexp
             schema_field_name = to_camel_case(field_name) if auto_camelcase else field_name
             pattern = re.compile(
                 r"(\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
                     entity_name, schema_field_name))
-            schema = pattern.sub(r'\g<1> @external ', schema)
+            schema = pattern.sub(rf'\g<1> {decorator(getattr(field, mark_name))} ', schema)
 
     return schema
+
+
+def _mark_external(entity_name, entity, schema, auto_camelcase):
+    return _mark_field(
+        entity_name, entity, schema, '_external', lambda _: '@external', auto_camelcase)
+
+
+def _mark_requires(entity_name, entity, schema, auto_camelcase):
+    return _mark_field(
+        entity_name, entity, schema, '_requires', lambda fields: f'@requires(fields: "{fields}")',
+        auto_camelcase
+    )
 
 
 def get_sdl(schema, custom_entities):
@@ -37,6 +51,7 @@ def get_sdl(schema, custom_entities):
 
     for entity_name, entity in extended_types.items():
         string_schema = _mark_external(entity_name, entity, string_schema, schema.auto_camelcase)
+        string_schema = _mark_requires(entity_name, entity, string_schema, schema.auto_camelcase)
 
         type_def_re = r"type %s ([^\{]*)" % entity_name
         type_def = r"type %s " % entity_name

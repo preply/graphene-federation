@@ -118,3 +118,30 @@ def test_multiple_key_decorators_apply_multiple_key_annotations():
 def test_avoid_duplication_of_key_decorator():
     sdl = fetch_sdl('service_a')
     assert 'extend type FileNode   @key(fields: \"id\") {' in sdl
+
+
+def test_requires():
+    query = {
+        'query': """
+            query {
+                articles {
+                    id
+                    text
+                    author {
+                        uppercaseEmail
+                    }
+                }
+            }
+        """,
+        'variables': {}
+    }
+    response = requests.post(
+        'http://federation:3000/graphql/',
+        json=query,
+    )
+    assert response.status_code == 200
+    data = json.loads(response.content)['data']
+    articles = data['articles']
+
+    assert articles == [
+        {'id': 1, 'text': 'some text', 'author': {'uppercaseEmail': 'NAME_5@GMAIL.COM'}}]
