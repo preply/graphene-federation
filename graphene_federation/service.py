@@ -8,17 +8,19 @@ from .entity import custom_entities
 
 
 def _mark_field(
-        entity_name, entity, schema: str, mark_name: str, decorator: callable, auto_camelcase: bool
+        entity_name, entity, schema: str, mark_attr_name: str,
+        decorator_resolver: callable, auto_camelcase: bool
 ):
     for field_name in dir(entity):
         field = getattr(entity, field_name, None)
-        if field is not None and getattr(field, mark_name, None):
+        if field is not None and getattr(field, mark_attr_name, None):
             # todo write tests on regexp
             schema_field_name = to_camel_case(field_name) if auto_camelcase else field_name
             pattern = re.compile(
                 r"(\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
                     entity_name, schema_field_name))
-            schema = pattern.sub(rf'\g<1> {decorator(getattr(field, mark_name))} ', schema)
+            schema = pattern.sub(
+                rf'\g<1> {decorator_resolver(getattr(field, mark_attr_name))} ', schema)
 
     return schema
 
