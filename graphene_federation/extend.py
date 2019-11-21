@@ -20,3 +20,8 @@ def extend(fields: str):
 def external(field):
     field._external = True
     return field
+
+
+def requires(field, fields: str):
+    field._requires = fields
+    return field

@@ -27,9 +27,9 @@ Supports now:
     ```
 * extend  # extend remote types
 * external  # mark field as external 
+* requires  # mark that field resolver requires other fields to be pre-fetched
 
 Todo implement:
-* @requires
 * @provides
 
 

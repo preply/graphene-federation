@@ -1,2 +1,2 @@
 from .main import key, build_schema
-from .extend import extend, external
+from .extend import extend, external, requires
