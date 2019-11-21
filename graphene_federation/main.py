@@ -19,17 +19,3 @@ def _get_query(schema, query_cls=None):
 def build_schema(query=None, mutation=None, **kwargs):
     schema = graphene.Schema(query=query, mutation=mutation, **kwargs)
     return graphene.Schema(query=_get_query(schema, query), mutation=mutation, **kwargs)
-
-
-def key(fields: str):
-    def decorator(Type):
-        register_entity(Type.__name__, Type)
-
-        existing = getattr(Type, "_sdl", "")
-
-        key_sdl = f'@key(fields: "{fields}")'
-        updated = f"{key_sdl} {existing}" if existing else key_sdl
-
-        setattr(Type, '_sdl', updated)
-        return Type
-    return decorator
