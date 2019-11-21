@@ -1,7 +1,7 @@
 # graphene-federation
 Federation support for graphene
 
-Build: [![CircleCI](https://circleci.com/gh/preply/graphene-federation.svg?style=svg)](https://circleci.com/gh/erebus1/graphene-federation)
+Build: [![CircleCI](https://circleci.com/gh/preply/graphene-federation.svg?style=svg)](https://circleci.com/gh/preply/graphene-federation)
 
 
 Federation specs implementation on top of Python graphene lib 
@@ -100,7 +100,7 @@ For more details see [examples](examples/)
 
 Or better check [integration_tests](integration_tests/)
 
-Also cool [example](https://github.com/erebus1/graphene-federation/issues/1) of integration with Mongoengine
+Also cool [example](https://github.com/preply/graphene-federation/issues/1) of integration with Mongoengine
 
 
 ### For contribution:
