@@ -50,3 +50,17 @@ def get_entity_query(auto_camelcase):
             return entities
 
     return EntityQuery
+
+
+def key(fields: str):
+    def decorator(Type):
+        register_entity(Type.__name__, Type)
+
+        existing = getattr(Type, "_sdl", "")
+
+        key_sdl = f'@key(fields: "{fields}")'
+        updated = f"{key_sdl} {existing}" if existing else key_sdl
+
+        setattr(Type, '_sdl', updated)
+        return Type
+    return decorator

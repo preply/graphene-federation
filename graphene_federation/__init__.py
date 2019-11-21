@@ -1,2 +1,3 @@
-from .main import key, build_schema
+from .main import build_schema
+from .entity import key
 from .extend import extend, external, requires
