@@ -145,3 +145,30 @@ def test_requires():
 
     assert articles == [
         {'id': 1, 'text': 'some text', 'author': {'uppercaseEmail': 'NAME_5@GMAIL.COM'}}]
+
+
+def test_provides():
+    query = {
+        'query': """
+                query {
+                    articles {
+                        id
+                        text
+                        author {
+                            age
+                        }
+                    }
+                }
+            """,
+        'variables': {}
+    }
+    response = requests.post(
+        'http://federation:3000/graphql/',
+        json=query,
+    )
+    assert response.status_code == 200
+    data = json.loads(response.content)['data']
+    articles = data['articles']
+
+    assert articles == [
+        {'id': 1, 'text': 'some text', 'author': {'age': 18}}]
