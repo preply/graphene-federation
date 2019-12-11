@@ -110,4 +110,4 @@ Also cool [example](https://github.com/preply/graphene-federation/issues/1) of i
 
 ---------------------------
 
-Also, you can read about how we've come to federation at Preply [here](https://medium.com/preply-engineering/apollo-federation-support-in-graphene-761a0512456d): 
+Also, you can read about how we've come to federation at Preply [here](https://medium.com/preply-engineering/apollo-federation-support-in-graphene-761a0512456d) 
