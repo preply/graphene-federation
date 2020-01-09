@@ -107,3 +107,7 @@ Also cool [example](https://github.com/preply/graphene-federation/issues/1) of i
 #### Run tests:
 * `make test`
 * if you've changed Dockerfile or requirements run `make build` before `make test`
+
+---------------------------
+
+Also, you can read about how we've come to federation at Preply [here](https://medium.com/preply-engineering/apollo-federation-support-in-graphene-761a0512456d) 

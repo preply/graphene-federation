@@ -1,5 +1,5 @@
 from graphene import ObjectType, String, Int, List, NonNull, Field
-from graphene_federation import build_schema, extend, external, requires, provides
+from graphene_federation import build_schema, extend, external, requires
 
 
 @extend(fields='id')
@@ -16,10 +16,14 @@ class User(ObjectType):
         return 18
 
 
+@key(fields='id')
 class Article(ObjectType):
     id = Int(required=True)
     text = String(required=True)
     author = provides(Field(lambda: User), fields='age')
+
+    def __resolve_reference(self, info, **kwargs):
+        return Article(id=self.id, text=f'text_{self.id}')
 
 
 class Query(ObjectType):
