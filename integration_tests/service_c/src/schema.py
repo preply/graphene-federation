@@ -20,7 +20,7 @@ class User(ObjectType):
 class Article(ObjectType):
     id = Int(required=True)
     text = String(required=True)
-    author = provides(Field(lambda: User), fields='age')
+    author = provides(Field(lambda: User), fields='age', parent_type=lambda: Article)
 
     def __resolve_reference(self, info, **kwargs):
         return Article(id=self.id, text=f'text_{self.id}')

@@ -64,8 +64,3 @@ def key(fields: str):
         setattr(Type, '_sdl', updated)
         return Type
     return decorator
-
-
-def provides(field, fields: str):
-    field._provides = fields
-    return field

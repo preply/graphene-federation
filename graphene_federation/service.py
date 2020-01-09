@@ -4,6 +4,7 @@ from graphene import ObjectType, String, Field
 from graphene.utils.str_converters import to_camel_case
 
 from graphene_federation.extend import extended_types
+from graphene_federation.provides import provides_parent_types
 from .entity import custom_entities
 
 
@@ -58,6 +59,11 @@ def get_sdl(schema, custom_entities):
         repl_str = r"\1 %s " % entity._sdl
         pattern = re.compile(type_def_re)
         string_schema = pattern.sub(repl_str, string_schema)
+
+    for type_getter in provides_parent_types:
+        entity = type_getter()
+        string_schema = _mark_provides(
+            entity.__name__, entity, string_schema, schema.auto_camelcase)
 
     for entity_name, entity in extended_types.items():
         string_schema = _mark_external(entity_name, entity, string_schema, schema.auto_camelcase)
