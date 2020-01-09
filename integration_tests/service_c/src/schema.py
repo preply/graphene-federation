@@ -1,5 +1,5 @@
 from graphene import ObjectType, String, Int, List, NonNull, Field
-from graphene_federation import build_schema, extend, external, requires
+from graphene_federation import build_schema, extend, external, requires, key, provides
 
 
 @extend(fields='id')
