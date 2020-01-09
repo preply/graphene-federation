@@ -36,6 +36,18 @@ services:
       timeout: 10s
       retries: 10
 
+  service_d:
+    build: service_d/.
+    volumes:
+      - ./service_d/src:/project/src
+      - ../:/project/federation_deps
+    command: sh -c "pip install ./federation_deps && python ./src/app.py"
+    healthcheck:
+      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
+
   federation:
     build: federation/.
     volumes:
@@ -53,6 +65,8 @@ services:
       service_b:
         condition: service_healthy
       service_c:
+        condition: service_healthy
+      service_d:
         condition: service_healthy
 
   proxy_dep:
