@@ -17,8 +17,8 @@ setup(
   long_description_content_type='text/markdown',
   author = 'Igor Kasianov',
   author_email = 'super.hang.glider@gmail.com',
-  url = 'https://github.com/erebus1/graphene-federation',
-  download_url = f'https://github.com/erebus1/graphene-federation/archive/{version}.tar.gz',
+  url = 'https://github.com/preply/graphene-federation',
+  download_url = f'https://github.com/preply/graphene-federation/archive/{version}.tar.gz',
   keywords = ['graphene', 'gql', 'federation'],
   install_requires=[
           "graphene>=2.1.0,<3"
