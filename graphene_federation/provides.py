@@ -10,10 +10,10 @@ def provides(field, fields: str = None):
     :param fields:
     :return:
     """
-    if fields is None:
+    if fields is None:  # used as decorator on base type
         if isinstance(field, Field):
             raise RuntimeError("Please specify fields")
         provides_parent_types.add(field)
-    else:
+    else:  # used as wrapper over field
         field._provides = fields
     return field
