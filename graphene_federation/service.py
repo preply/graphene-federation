@@ -59,8 +59,7 @@ def get_sdl(schema, custom_entities):
         pattern = re.compile(type_def_re)
         string_schema = pattern.sub(repl_str, string_schema)
 
-    for type_getter in provides_parent_types:
-        entity = type_getter()
+    for entity in provides_parent_types:
         string_schema = _mark_provides(
             entity.__name__, entity, string_schema, schema.auto_camelcase)
 

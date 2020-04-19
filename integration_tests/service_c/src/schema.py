@@ -26,14 +26,14 @@ class Article(ObjectType):
         return Article(id=self.id, text=f'text_{self.id}')
 
 
+@provides
 class ArticleThatProvideAuthorAge(ObjectType):
     """
-    should not contain any graphene-federation decorators to proper test test-case
+    should not contain other graphene-federation decorators to proper test test-case
     """
     id = Int(required=True)
     text = String(required=True)
-    author = provides(
-        Field(lambda: User), fields='age', parent_type=lambda: ArticleThatProvideAuthorAge)
+    author = provides(Field(User), fields='age')
 
     def __resolve_reference(self, info, **kwargs):
         return Article(id=self.id, text=f'text_{self.id}')

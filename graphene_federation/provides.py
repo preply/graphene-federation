@@ -1,11 +1,19 @@
-provides_parent_types = []
+from graphene import Field
+
+provides_parent_types = set()
 
 
-def register_provides_parent_type(typename, Type):
-    provides_parent_types[typename] = Type
+def provides(field, fields: str = None):
+    """
 
-
-def provides(field, fields: str, parent_type: callable):
-    field._provides = fields
-    provides_parent_types.append(parent_type)
+    :param field: base type (when used as decorator) or field of base type
+    :param fields:
+    :return:
+    """
+    if fields is None:
+        if isinstance(field, Field):
+            raise RuntimeError("Please specify fields")
+        provides_parent_types.add(field)
+    else:
+        field._provides = fields
     return field
