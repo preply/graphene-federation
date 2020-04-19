@@ -28,9 +28,18 @@ Supports now:
 * extend  # extend remote types
 * external  # mark field as external 
 * requires  # mark that field resolver requires other fields to be pre-fetched
-
-Todo implement:
-* @provides
+* provides  # to annotate the expected returned fieldset from a field on a base type that is guaranteed to be selectable by the gateway. 
+    * **Base class should be decorated with `@provides`** as well as field on a base type that provides.
+    ```python
+        import graphene
+        from graphene_federation import provides
+        
+        @provides
+        class ArticleThatProvideAuthorAge(graphene.ObjectType):
+            id = Int(required=True)
+            text = String(required=True)
+            author = provides(Field(User), fields='age')
+    ```
 
 
 ```python
