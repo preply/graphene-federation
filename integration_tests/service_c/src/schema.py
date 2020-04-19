@@ -41,14 +41,14 @@ class ArticleThatProvideAuthorAge(ObjectType):
 
 class Query(ObjectType):
     articles = List(NonNull(lambda: Article))
-    articles_with_author_age = List(NonNull(lambda: ArticleThatProvideAuthorAge))
+    articles_with_author_age_provide = List(NonNull(lambda: ArticleThatProvideAuthorAge))
 
     def resolve_articles(self, info):
         return [
             Article(id=1, text='some text', author=User(id=5))
         ]
 
-    def resolve_articles_with_author_age(self, info):
+    def resolve_articles_with_author_age_provide(self, info):
         return [
             ArticleThatProvideAuthorAge(id=1, text='some text', author=User(id=5))
         ]
