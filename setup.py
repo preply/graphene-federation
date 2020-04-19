@@ -5,7 +5,7 @@ from setuptools import setup
 def read(*rnames):
   return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.0.6'
+version = '0.1.0'
 
 setup(
   name = 'graphene-federation',
@@ -24,7 +24,7 @@ setup(
           "graphene>=2.1.0,<3"
       ],
   classifiers=[
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries",
     "Programming Language :: Python :: 3.6",
