@@ -20,7 +20,20 @@ class User(ObjectType):
 class Article(ObjectType):
     id = Int(required=True)
     text = String(required=True)
-    author = provides(Field(lambda: User), fields='age', parent_type=lambda: Article)
+    author = Field(lambda: User)
+
+    def __resolve_reference(self, info, **kwargs):
+        return Article(id=self.id, text=f'text_{self.id}')
+
+
+class ArticleThatProvideAuthorAge(ObjectType):
+    """
+    should not contain any graphene-federation decorators to proper test test-case
+    """
+    id = Int(required=True)
+    text = String(required=True)
+    author = provides(
+        Field(lambda: User), fields='age', parent_type=lambda: ArticleThatProvideAuthorAge)
 
     def __resolve_reference(self, info, **kwargs):
         return Article(id=self.id, text=f'text_{self.id}')
@@ -28,10 +41,16 @@ class Article(ObjectType):
 
 class Query(ObjectType):
     articles = List(NonNull(lambda: Article))
+    articles_with_author_age = List(NonNull(lambda: ArticleThatProvideAuthorAge))
 
     def resolve_articles(self, info):
         return [
             Article(id=1, text='some text', author=User(id=5))
+        ]
+
+    def resolve_articles_with_author_age(self, info):
+        return [
+            ArticleThatProvideAuthorAge(id=1, text='some text', author=User(id=5))
         ]
 
 

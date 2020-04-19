@@ -148,10 +148,23 @@ def test_requires():
 
 
 def test_provides():
+    """
+    articles -> w/o provide (get age value from service b)
+    articlesWithAuthorAge -> w/ provide (get age value from service c)
+
+    :return:
+    """
     query = {
         'query': """
                 query {
                     articles {
+                        id
+                        text
+                        author {
+                            age
+                        }
+                    }
+                    articlesWithAuthorAge {
                         id
                         text
                         author {
@@ -169,6 +182,10 @@ def test_provides():
     assert response.status_code == 200
     data = json.loads(response.content)['data']
     articles = data['articles']
+    articles_with_age_provide = data['articlesWithAuthorAge']
 
     assert articles == [
+        {'id': 1, 'text': 'some text', 'author': {'age': 17}}]
+
+    assert articles_with_age_provide == [
         {'id': 1, 'text': 'some text', 'author': {'age': 18}}]
