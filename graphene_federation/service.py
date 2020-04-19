@@ -4,6 +4,7 @@ from graphene import ObjectType, String, Field
 from graphene.utils.str_converters import to_camel_case
 
 from graphene_federation.extend import extended_types
+from graphene_federation.provides import provides_parent_types
 from .entity import custom_entities
 
 
@@ -37,6 +38,13 @@ def _mark_requires(entity_name, entity, schema, auto_camelcase):
     )
 
 
+def _mark_provides(entity_name, entity, schema, auto_camelcase):
+    return _mark_field(
+        entity_name, entity, schema, '_provides', lambda fields: f'@provides(fields: "{fields}")',
+        auto_camelcase
+    )
+
+
 def get_sdl(schema, custom_entities):
     string_schema = str(schema)
     string_schema = string_schema.replace("\n", " ")
@@ -50,6 +58,10 @@ def get_sdl(schema, custom_entities):
         repl_str = r"\1 %s " % entity._sdl
         pattern = re.compile(type_def_re)
         string_schema = pattern.sub(repl_str, string_schema)
+
+    for entity in provides_parent_types:
+        string_schema = _mark_provides(
+            entity.__name__, entity, string_schema, schema.auto_camelcase)
 
     for entity_name, entity in extended_types.items():
         string_schema = _mark_external(entity_name, entity, string_schema, schema.auto_camelcase)

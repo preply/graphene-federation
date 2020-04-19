@@ -31,6 +31,10 @@ class FileNode(ObjectType):
 class User(ObjectType):
     id = Int(required=True)
     primary_email = String()
+    age = Int()
+
+    def resolve_age(self, info):
+        return 17
 
     def __resolve_reference(self, info, **kwargs):
         if self.id is not None:
