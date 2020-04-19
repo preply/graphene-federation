@@ -54,7 +54,6 @@ def get_sdl(schema, custom_entities):
     string_schema = pattern.sub(" ", string_schema)
 
     for entity_name, entity in custom_entities.items():
-        string_schema = _mark_provides(entity_name, entity, string_schema, schema.auto_camelcase)
         type_def_re = r"(type %s [^\{]*)" % entity_name
         repl_str = r"\1 %s " % entity._sdl
         pattern = re.compile(type_def_re)
