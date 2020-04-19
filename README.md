@@ -29,7 +29,7 @@ Supports now:
 * external  # mark field as external 
 * requires  # mark that field resolver requires other fields to be pre-fetched
 * provides  # to annotate the expected returned fieldset from a field on a base type that is guaranteed to be selectable by the gateway. 
-    * **Base class should be decorated with `@provides`** as well as field on a base type that provides.
+    * **Base class should be decorated with `@provides`** as well as field on a base type that provides. Check example bellow:
     ```python
         import graphene
         from graphene_federation import provides
