@@ -82,7 +82,7 @@ def fetch_sdl(service_name='service_b'):
         """,
         'variables': {}
     }
-    response = requests.post(f'http://{service_name}:5000/graphql', json=query)
+    response = requests.post('http://{0}:5000/graphql'.format(service_name), json=query)
     assert response.status_code == 200
     return response.json()['data']['_service']['sdl']
 

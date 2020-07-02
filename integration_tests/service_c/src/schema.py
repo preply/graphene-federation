@@ -23,7 +23,7 @@ class Article(ObjectType):
     author = Field(lambda: User)
 
     def __resolve_reference(self, info, **kwargs):
-        return Article(id=self.id, text=f'text_{self.id}')
+        return Article(id=self.id, text='text_{0}'.format(self.id))
 
 
 @provides
@@ -36,7 +36,7 @@ class ArticleThatProvideAuthorAge(ObjectType):
     author = provides(Field(User), fields='age')
 
     def __resolve_reference(self, info, **kwargs):
-        return Article(id=self.id, text=f'text_{self.id}')
+        return Article(id=self.id, text='text_{0}'.format(self.id))
 
 
 class Query(ObjectType):

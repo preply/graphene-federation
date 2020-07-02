@@ -22,7 +22,7 @@ Supports now:
         
             def __resolve_reference(self, info, **kwargs):
                 if self.id is not None:
-                    return User(id=self.id, email=f'name_{self.id}@gmail.com')
+                    return User(id=self.id, email='name_{0}@gmail.com'.format(self.id))
                 return User(id=123, email=self.email)              
     ```
 * extend  # extend remote types

@@ -13,7 +13,7 @@ class FunnyText(ObjectType):
         interfaces = (TextInterface,)
 
     def __resolve_reference(self, info, **kwargs):
-        return FunnyText(id=self.id, body=f'funny_text_{self.id}')
+        return FunnyText(id=self.id, body='funny_text_{0}'.format(self.id))
 
 
 @key(fields='id')
@@ -23,7 +23,7 @@ class FileNode(ObjectType):
 
     def __resolve_reference(self, info, **kwargs):
         # todo test raise exception here
-        return FileNode(id=self.id, name=f'file_{self.id}')
+        return FileNode(id=self.id, name='file_{0}'.format(self.id))
 
 
 @key('id')
@@ -38,7 +38,7 @@ class User(ObjectType):
 
     def __resolve_reference(self, info, **kwargs):
         if self.id is not None:
-            return User(id=self.id, primary_email=f'name_{self.id}@gmail.com')
+            return User(id=self.id, primary_email='name_{0}@gmail.com'.format(self.id))
 
         user_id = 1001 if self.primary_email == "frank@frank.com" else \
             hash(self.primary_email) % 10000000

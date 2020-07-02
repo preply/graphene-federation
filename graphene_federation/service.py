@@ -21,7 +21,7 @@ def _mark_field(
                 r"(type\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
                     entity_name, schema_field_name))
             schema = pattern.sub(
-                rf'\g<1> {decorator_resolver(getattr(field, mark_attr_name))} ', schema)
+                r'\g<1> {0} '.format(decorator_resolver(getattr(field, mark_attr_name))), schema)
 
     return schema
 
@@ -33,14 +33,14 @@ def _mark_external(entity_name, entity, schema, auto_camelcase):
 
 def _mark_requires(entity_name, entity, schema, auto_camelcase):
     return _mark_field(
-        entity_name, entity, schema, '_requires', lambda fields: f'@requires(fields: "{fields}")',
+        entity_name, entity, schema, '_requires', lambda fields: '@requires(fields: "{0}")'.format(fields),
         auto_camelcase
     )
 
 
 def _mark_provides(entity_name, entity, schema, auto_camelcase):
     return _mark_field(
-        entity_name, entity, schema, '_provides', lambda fields: f'@provides(fields: "{fields}")',
+        entity_name, entity, schema, '_provides', lambda fields: '@provides(fields: "{0}")'.format(fields),
         auto_camelcase
     )
 
