@@ -12,7 +12,7 @@ pytest = "*"
 
 [packages]
 
-graphene = "==3.0.0b5"
+graphene = ">=3.0.0b5,<4"
 
 
 [requires]
