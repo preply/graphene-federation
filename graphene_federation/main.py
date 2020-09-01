@@ -3,6 +3,28 @@ import graphene
 from .entity import get_entity_query, register_entity
 from .service import get_service_query
 
+class SchemaWithCamelCase(graphene.Schema):
+    """
+    Schema with `auto_camelcase` available as an attribute.
+    """
+    def __init__(
+        self,
+        query=None,
+        mutation=None,
+        subscription=None,
+        types=None,
+        directives=None,
+        auto_camelcase=True,
+    ):
+        self.auto_camelcase = auto_camelcase
+        super().__init__(
+            query,
+            mutation,
+            subscription,
+            types,
+            directives,
+            auto_camelcase
+        )
 
 def _get_query(schema, query_cls=None):
     bases = [get_service_query(schema)]
