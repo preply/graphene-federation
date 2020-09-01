@@ -5,7 +5,7 @@ from setuptools import setup
 def read(*rnames):
   return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.1.0'
+version = '1.0.0b1'
 
 setup(
   name = 'graphene-federation',
