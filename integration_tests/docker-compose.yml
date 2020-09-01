@@ -11,8 +11,6 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-    ports:
-      - "5001:5000"
 
   service_b:
     build: service_b/.
@@ -25,8 +23,6 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-    ports:
-      - "5002:5000"
 
   service_c:
     build: service_c/.
@@ -39,8 +35,6 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-    ports:
-      - "5003:5000"
 
   service_d:
     build: service_d/.
@@ -53,8 +47,6 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-    ports:
-      - "5004:5000"
 
   federation:
     build: federation/.
