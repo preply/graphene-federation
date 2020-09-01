@@ -20,7 +20,7 @@ def get_entity_cls():
     return _Entity
 
 
-def get_entity_query(auto_camelcase):
+def get_entity_query():
     if not custom_entities:
         return
 
@@ -34,8 +34,10 @@ def get_entity_query(auto_camelcase):
                 model_aguments = representation.copy()
                 model_aguments.pop("__typename")
                 # todo use schema to identify correct mapping for field names
-                if auto_camelcase:
-                    model_aguments = {to_snake_case(k): v for k, v in model_aguments.items()}
+                model_aguments = {
+                    to_snake_case(k): v
+                    for k, v in model_aguments.items()
+                }
                 model_instance = model(**model_aguments)
 
                 try:
