@@ -28,7 +28,7 @@ class SchemaWithCamelCase(graphene.Schema):
 
 def _get_query(schema, query_cls=None):
     bases = [get_service_query(schema)]
-    entity_cls = get_entity_query()
+    entity_cls = get_entity_query(schema.auto_camelcase)
     if entity_cls:
         bases.append(entity_cls)
     if query_cls is not None:

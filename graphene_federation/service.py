@@ -10,13 +10,13 @@ from .entity import custom_entities
 
 def _mark_field(
         entity_name, entity, schema: str, mark_attr_name: str,
-        decorator_resolver: callable
+        decorator_resolver: callable, auto_camelcase: bool
 ):
     for field_name in dir(entity):
         field = getattr(entity, field_name, None)
         if field is not None and getattr(field, mark_attr_name, None):
             # todo write tests on regexp
-            schema_field_name = to_camel_case(field_name)
+            schema_field_name = to_camel_case(field_name) if auto_camelcase else field_name
             pattern = re.compile(
                 r"(type\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
                     entity_name, schema_field_name))
@@ -26,20 +26,22 @@ def _mark_field(
     return schema
 
 
-def _mark_external(entity_name, entity, schema):
+def _mark_external(entity_name, entity, schema, auto_camelcase):
     return _mark_field(
-        entity_name, entity, schema, '_external', lambda _: '@external')
+        entity_name, entity, schema, '_external', lambda _: '@external', auto_camelcase)
 
 
-def _mark_requires(entity_name, entity, schema):
+def _mark_requires(entity_name, entity, schema, auto_camelcase):
     return _mark_field(
-        entity_name, entity, schema, '_requires', lambda fields: f'@requires(fields: "{fields}")'
+        entity_name, entity, schema, '_requires', lambda fields: f'@requires(fields: "{fields}")',
+        auto_camelcase
     )
 
 
-def _mark_provides(entity_name, entity, schema):
+def _mark_provides(entity_name, entity, schema, auto_camelcase):
     return _mark_field(
-        entity_name, entity, schema, '_provides', lambda fields: f'@provides(fields: "{fields}")'
+        entity_name, entity, schema, '_provides', lambda fields: f'@provides(fields: "{fields}")',
+        auto_camelcase
     )
 
 
@@ -59,11 +61,11 @@ def get_sdl(schema, custom_entities):
 
     for entity in provides_parent_types:
         string_schema = _mark_provides(
-            entity.__name__, entity, string_schema)
+            entity.__name__, entity, string_schema, schema.auto_camelcase)
 
     for entity_name, entity in extended_types.items():
-        string_schema = _mark_external(entity_name, entity, string_schema)
-        string_schema = _mark_requires(entity_name, entity, string_schema)
+        string_schema = _mark_external(entity_name, entity, string_schema, schema.auto_camelcase)
+        string_schema = _mark_requires(entity_name, entity, string_schema, schema.auto_camelcase)
 
         type_def_re = r"type %s ([^\{]*)" % entity_name
         type_def = r"type %s " % entity_name

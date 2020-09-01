@@ -20,14 +20,12 @@ def get_entity_cls():
     return _Entity
 
 
-def get_entity_query():
+def get_entity_query(auto_camelcase):
     if not custom_entities:
         return
 
     class EntityQuery:
-        entities = graphene.List(
-            get_entity_cls(), name="_entities", representations=List(_Any)
-        )
+        entities = graphene.List(get_entity_cls(), name="_entities", representations=List(_Any))
 
         def resolve_entities(parent, info, representations):
             entities = []
@@ -36,10 +34,8 @@ def get_entity_query():
                 model_aguments = representation.copy()
                 model_aguments.pop("__typename")
                 # todo use schema to identify correct mapping for field names
-                model_aguments = {
-                    to_snake_case(k): v
-                    for k, v in model_aguments.items()
-                }
+                if auto_camelcase:
+                    model_aguments = {to_snake_case(k): v for k, v in model_aguments.items()}
                 model_instance = model(**model_aguments)
 
                 try:
