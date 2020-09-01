@@ -36,6 +36,10 @@ class FunnyTextAnother(ObjectType):
 @extend(fields='primaryEmail')
 class User(ObjectType):
     primaryEmail = external(String())
+    snake_case = String(description="Test that auto_camelcase is respected.")
+
+    def resolve_snake_case(self, info, **kwargs):
+        return "snake_case"
 
 
 class Post(ObjectType):

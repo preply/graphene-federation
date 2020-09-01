@@ -35,6 +35,7 @@ def test_external_types():
                     author {
                         id
                         primaryEmail
+                        snake_case
                     }
                 }
                 articles {
@@ -65,7 +66,9 @@ def test_external_types():
     assert {'id': 2, 'body': 'funny_text_2', 'color': 4} == posts[1]['text']
     assert posts[2]['files'] is None
     assert {'id': 3, 'body': 'funny_text_3', 'color': 5} == posts[2]['text']
-    assert {'id': 1001, 'primaryEmail': 'frank@frank.com', } == posts[3]['author']
+    assert {
+        'id': 1001, 'primaryEmail': 'frank@frank.com', 'snake_case': 'snake_case'
+    } == posts[3]['author']
 
     assert articles == [
         {'id': 1, 'text': 'some text', 'author': {'id': 5, 'primaryEmail': 'name_5@gmail.com'}}]
