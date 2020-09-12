@@ -129,6 +129,7 @@ def test_requires():
                     text
                     author {
                         uppercaseEmail
+                        emailDomain(upperCase:true)
                     }
                 }
             }
@@ -144,7 +145,7 @@ def test_requires():
     articles = data['articles']
 
     assert articles == [
-        {'id': 1, 'text': 'some text', 'author': {'uppercaseEmail': 'NAME_5@GMAIL.COM'}}]
+        {'id': 1, 'text': 'some text', 'author': {'uppercaseEmail': 'NAME_5@GMAIL.COM', 'emailDomain': 'GMAIL.COM'}}]
 
 
 def test_provides():
