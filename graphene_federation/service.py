@@ -1,83 +1,107 @@
 import re
 
-from graphene import ObjectType, String, Field
-from graphene.utils.str_converters import to_camel_case
+from typing import Any, Dict
+
+from packaging import version
+
+import graphene
+from graphene import ObjectType, String, Field, Schema, __version__ as graphene_version
+
+if version.parse(graphene_version) < version.parse('3.0.0'):
+    from graphql.utils.schema_printer import _print_fields as print_fields
+else:
+    from graphql.utilities.print_schema import print_fields as print_fields
 
 from graphene_federation.extend import extended_types
 from graphene_federation.provides import provides_parent_types
+
 from .entity import custom_entities
 
 
-def _mark_field(
-        entity_name, entity, schema: str, mark_attr_name: str,
-        decorator_resolver: callable, auto_camelcase: bool
-):
-    for field_name in dir(entity):
-        field = getattr(entity, field_name, None)
-        if field is not None and getattr(field, mark_attr_name, None):
-            # todo write tests on regexp
-            schema_field_name = to_camel_case(field_name) if auto_camelcase else field_name
-            pattern = re.compile(
-                r"(type\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
-                    entity_name, schema_field_name))
-            schema = pattern.sub(
-                rf'\g<1> {decorator_resolver(getattr(field, mark_attr_name))} ', schema)
+class MonoFieldType:
+    """
+    In order to be able to reuse the `print_fields` method to get a singular field
+    string definition, we need to define an object that has a `.fields` attribute.
+    """
+    def __init__(self, name, field):
+        self.fields = {
+            name: field
+        }
 
-    return schema
+DECORATORS = {
+    "_external": lambda _: "@external",
+    "_requires": lambda fields: f'@requires(fields: "{fields}")',
+    "_provides": lambda fields: f'@provides(fields: "{fields}")',
+}
 
+def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> str:
+    """
+    For a given entity, go through all its field and see if any directive decorator need to be added.
+    The methods (from graphene-federation) marking fields that require some special treatment for federation add
+    corresponding attributes to the field itself.
+    Those attributes are listed in the `DECORATORS` variable as key and their respective value is the resolver that
+    returns what needs to be amended to the field declaration.
 
-def _mark_external(entity_name, entity, schema, auto_camelcase):
-    return _mark_field(
-        entity_name, entity, schema, '_external', lambda _: '@external', auto_camelcase)
-
-
-def _mark_requires(entity_name, entity, schema, auto_camelcase):
-    return _mark_field(
-        entity_name, entity, schema, '_requires', lambda fields: f'@requires(fields: "{fields}")',
-        auto_camelcase
+    This method simply go through the field that need to be modified and replace them with their annotated version in the
+    schema string representation.
+    """
+    entity_name = entity._meta.name
+    entity_type = schema._type_map[entity_name]
+    str_fields = []
+    for name, field in entity_type.fields.items():
+        str_field = print_fields(MonoFieldType(name, field))
+        f = getattr(entity, name, None)
+        if f is not None:
+            for decorator, decorator_resolver in DECORATORS.items():
+                decorator_value = getattr(f, decorator, None)
+                if decorator_value:
+                    str_field += f" {decorator_resolver(decorator_value)}"
+        str_fields.append(str_field)
+    str_fields_annotated = "\n".join(str_fields)
+    # Replace the original field declaration by the annotated one
+    str_fields_original = print_fields(entity_type)
+    pattern = re.compile(
+        r"(type\s%s\s[^\{]*)\{\s*%s\s*\}" % (
+            entity_name, re.escape(str_fields_original)
+        )
+    )
+    string_schema = pattern.sub(
+        r"\g<1> {\n%s\n}" % str_fields_annotated,
+        string_schema
     )
 
 
-def _mark_provides(entity_name, entity, schema, auto_camelcase):
-    return _mark_field(
-        entity_name, entity, schema, '_provides', lambda fields: f'@provides(fields: "{fields}")',
-        auto_camelcase
-    )
-
-
-def get_sdl(schema, custom_entities):
+def get_sdl(schema: Schema, custom_entities: Dict[str, Any]) -> str:
+    """
+    Add all needed decorators to the string representation of the schema.
+    """
     string_schema = str(schema)
-    string_schema = string_schema.replace("\n", " ")
 
     regex = r"schema \{(\w|\!|\s|\:)*\}"
     pattern = re.compile(regex)
     string_schema = pattern.sub(" ", string_schema)
 
+    # Add entity sdl
     for entity_name, entity in custom_entities.items():
         type_def_re = r"(type %s [^\{]*)" % entity_name
         repl_str = r"\1 %s " % entity._sdl
         pattern = re.compile(type_def_re)
         string_schema = pattern.sub(repl_str, string_schema)
 
-    for entity in provides_parent_types:
-        string_schema = _mark_provides(
-            entity.__name__, entity, string_schema, schema.auto_camelcase)
+    # Add fields directives (@external, @provides, @requires)
+    for entity in provides_parent_types | set(extended_types.values()):
+        add_entity_fields_decorators(entity, schema, string_schema)
 
+    # Prepend `extend` keyword to the type definition of extended types
     for entity_name, entity in extended_types.items():
-        string_schema = _mark_external(entity_name, entity, string_schema, schema.auto_camelcase)
-        string_schema = _mark_requires(entity_name, entity, string_schema, schema.auto_camelcase)
-
-        type_def_re = r"type %s ([^\{]*)" % entity_name
-        type_def = r"type %s " % entity_name
-        repl_str = r"extend %s \1" % type_def
-        pattern = re.compile(type_def_re)
-
-        string_schema = pattern.sub(repl_str, string_schema)
+        type_def = re.compile(r"type %s ([^\{]*)" % entity_name)
+        repl_str = r"extend type %s \1" % entity_name
+        string_schema = type_def.sub(repl_str, string_schema)
 
     return string_schema
 
 
-def get_service_query(schema):
+def get_service_query(schema: Schema):
     sdl_str = get_sdl(schema, custom_entities)
 
     class _Service(ObjectType):

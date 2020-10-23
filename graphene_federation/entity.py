@@ -40,7 +40,7 @@ def get_entity_query(auto_camelcase):
 
                 try:
                     resolver = getattr(
-                        model, "_%s__resolve_reference" % representation["__typename"])
+                        model, "_%s__resolve_reference" % model.__name__)
                 except AttributeError:
                     pass
                 else:
@@ -54,7 +54,7 @@ def get_entity_query(auto_camelcase):
 
 def key(fields: str):
     def decorator(Type):
-        register_entity(Type.__name__, Type)
+        register_entity(Type._meta.name, Type)
 
         existing = getattr(Type, "_sdl", "")
 

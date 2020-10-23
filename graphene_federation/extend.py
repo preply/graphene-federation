@@ -10,8 +10,8 @@ def extend(fields: str):
     def decorator(Type):
         if hasattr(Type, '_sdl'):
             raise RuntimeError("Can't extend type which is already extended or has @key")
-        register_entity(Type.__name__, Type)
-        register_extend_type(Type.__name__, Type)
+        register_entity(Type._meta.name, Type)
+        register_extend_type(Type._meta.name, Type)
         setattr(Type, '_sdl', '@key(fields: "%s")' % fields)
         return Type
     return decorator
