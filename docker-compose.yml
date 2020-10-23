@@ -1,0 +1,9 @@
+version: '3.5'
+
+services:
+
+  graphene_federation:
+    build:
+      context: .
+    volumes:
+      - ./:/workdir
