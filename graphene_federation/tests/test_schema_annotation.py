@@ -9,33 +9,33 @@ from ..main import build_schema
 # ------------------------
 # User service
 # ------------------------
-# users = [
-#     {"user_id": "1", "name": "Jane", "email": "jane@mail.com"},
-#     {"user_id": "2", "name": "Jack", "email": "jack@mail.com"},
-#     {"user_id": "3", "name": "Mary", "email": "mary@mail.com"},
-# ]
+users = [
+    {"user_id": "1", "name": "Jane", "email": "jane@mail.com"},
+    {"user_id": "2", "name": "Jack", "email": "jack@mail.com"},
+    {"user_id": "3", "name": "Mary", "email": "mary@mail.com"},
+]
 
-# @key("user_id")
-# @key("email")
-# class User(ObjectType):
-#     user_id = ID(required=True)
-#     email = String(required=True)
-#     name = String()
+@key("user_id")
+@key("email")
+class User(ObjectType):
+    user_id = ID(required=True)
+    email = String(required=True)
+    name = String()
 
-#     def __resolve_reference(self, info, *args, **kwargs):
-#         if self.id:
-#             user = next(filter(lambda x: x["id"] == self.id, users))
-#         elif self.email:
-#             user = next(filter(lambda x: x["email"] == self.email, users))
-#         return User(**user)
+    def __resolve_reference(self, info, *args, **kwargs):
+        if self.id:
+            user = next(filter(lambda x: x["id"] == self.id, users))
+        elif self.email:
+            user = next(filter(lambda x: x["email"] == self.email, users))
+        return User(**user)
 
-# class UserQuery(ObjectType):
-#     user = Field(User, user_id=ID(required=True))
+class UserQuery(ObjectType):
+    user = Field(User, user_id=ID(required=True))
 
-#     def resolve_user(self, info, user_id, *args, **kwargs):
-#         return User(**next(filter(lambda x: x["user_id"] == user_id, users)))
+    def resolve_user(self, info, user_id, *args, **kwargs):
+        return User(**next(filter(lambda x: x["user_id"] == user_id, users)))
 
-# user_schema = build_schema(query=UserQuery)
+user_schema = build_schema(query=UserQuery)
 
 # ------------------------
 # Chat service
@@ -65,7 +65,7 @@ class ChatMessage(ObjectType):
 class ChatQuery(ObjectType):
     message = Field(ChatMessage, id=ID(required=True))
 
-    def resolve_user(self, info, id, *args, **kwargs):
+    def resolve_message(self, info, id, *args, **kwargs):
         return ChatMessage(**next(filter(lambda x: x["id"] == id, chat_messages)))
 
 chat_schema = build_schema(query=ChatQuery)
@@ -74,7 +74,7 @@ chat_schema = build_schema(query=ChatQuery)
 # Tests
 # ------------------------
 
-def xtest_user_schema():
+def test_user_schema():
     """
     Check that the user schema has been annotated correctly
     and that a request to retrieve a user works.
@@ -151,7 +151,7 @@ type _Service {
     query = """
     query {
         message(id: "4") {
-            name
+            text
             userId
         }
     }

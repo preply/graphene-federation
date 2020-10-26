@@ -1,42 +1,63 @@
-from graphene import List, Union
-from graphene.utils.str_converters import to_snake_case
+from typing import Any, Dict
+
+from graphene import List, Union, Schema
+from graphene.utils.str_converters import to_camel_case
 
 import graphene
 
 from .types import _Any
 
 
-custom_entities = {}
+def get_entities(schema: Schema) -> Dict[str, Any]:
+    """
+    Find all the entities from the schema.
+    They can be easily distinguished from the other type as
+    the `@key` and `@extend` decorators adds a `_sdl` attribute to them.
+    """
+    entities = {}
+    for type_name, type_ in schema._type_map.items():
+        if not hasattr(type_, "graphene_type"):
+            continue
+        if getattr(type_.graphene_type, "_sdl", None):
+            entities[type_name] = type_.graphene_type
+    return entities
 
 
-def register_entity(typename, Type):
-    custom_entities[typename] = Type
-
-
-def get_entity_cls():
+def get_entity_cls(entities: Dict[str, Any]):
+    """
+    Create _Entity type which is a union of all the entities types.
+    """
     class _Entity(Union):
         class Meta:
-            types = tuple(custom_entities.values())
+            types = tuple(entities.values())
     return _Entity
 
 
-def get_entity_query(auto_camelcase):
-    if not custom_entities:
+def get_entity_query(schema: Schema):
+    """
+    Create Entity query.
+    """
+    entities_dict = get_entities(schema)
+    if not entities_dict:
         return
 
-    class EntityQuery:
-        entities = graphene.List(get_entity_cls(), name="_entities", representations=List(_Any))
+    entity_type = get_entity_cls(entities_dict)
 
-        def resolve_entities(parent, info, representations):
+    class EntityQuery:
+        entities = graphene.List(entity_type, name="_entities", representations=List(_Any))
+
+        def resolve_entities(self, info, representations):
             entities = []
             for representation in representations:
-                model = custom_entities[representation["__typename"]]
-                model_aguments = representation.copy()
-                model_aguments.pop("__typename")
-                # todo use schema to identify correct mapping for field names
-                if auto_camelcase:
-                    model_aguments = {to_snake_case(k): v for k, v in model_aguments.items()}
-                model_instance = model(**model_aguments)
+                type_ = schema.get_type(representation["__typename"])
+                model = type_.graphene_type
+                model_arguments = representation.copy()
+                model_arguments.pop("__typename")
+                if schema.auto_camelcase:
+                    # Create field name conversion dict (from schema name to actual graphene_type field name)
+                    field_names = {to_camel_case(name): name for name in model._meta.fields}
+                    model_arguments = {field_names[k]: v for k, v in model_arguments.items()}
+                model_instance = model(**model_arguments)
 
                 try:
                     resolver = getattr(
@@ -54,8 +75,6 @@ def get_entity_query(auto_camelcase):
 
 def key(fields: str):
     def decorator(Type):
-        register_entity(Type._meta.name, Type)
-
         existing = getattr(Type, "_sdl", "")
 
         key_sdl = f'@key(fields: "{fields}")'

@@ -1,12 +1,12 @@
 import graphene
 
-from .entity import get_entity_query, register_entity
+from .entity import get_entity_query
 from .service import get_service_query
 
 
 def _get_query(schema, query_cls=None):
     bases = [get_service_query(schema)]
-    entity_cls = get_entity_query(schema.auto_camelcase)
+    entity_cls = get_entity_query(schema)
     if entity_cls:
         bases.append(entity_cls)
     if query_cls is not None:

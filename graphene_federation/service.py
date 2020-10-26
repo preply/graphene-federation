@@ -12,10 +12,10 @@ if version.parse(graphene_version) < version.parse('3.0.0'):
 else:
     from graphql.utilities.print_schema import print_fields as print_fields
 
-from graphene_federation.extend import extended_types
-from graphene_federation.provides import provides_parent_types
+from graphene_federation.extend import get_extended_types
+from graphene_federation.provides import get_provides_parent_types
 
-from .entity import custom_entities
+from .entity import get_entities
 
 
 class MonoFieldType:
@@ -46,7 +46,7 @@ def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> 
     schema string representation.
     """
     entity_name = entity._meta.name
-    entity_type = schema._type_map[entity_name]
+    entity_type = schema.get_type(entity_name)
     str_fields = []
     for name, field in entity_type.fields.items():
         str_field = print_fields(MonoFieldType(name, field))
@@ -65,13 +65,15 @@ def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> 
             entity_name, re.escape(str_fields_original)
         )
     )
+    string_schema_original = string_schema + ""
     string_schema = pattern.sub(
         r"\g<1> {\n%s\n}" % str_fields_annotated,
         string_schema
     )
+    return string_schema
 
 
-def get_sdl(schema: Schema, custom_entities: Dict[str, Any]) -> str:
+def get_sdl(schema: Schema) -> str:
     """
     Add all needed decorators to the string representation of the schema.
     """
@@ -81,16 +83,14 @@ def get_sdl(schema: Schema, custom_entities: Dict[str, Any]) -> str:
     pattern = re.compile(regex)
     string_schema = pattern.sub(" ", string_schema)
 
-    # Add entity sdl
-    for entity_name, entity in custom_entities.items():
-        type_def_re = r"(type %s [^\{]*)" % entity_name
-        repl_str = r"\1 %s " % entity._sdl
-        pattern = re.compile(type_def_re)
-        string_schema = pattern.sub(repl_str, string_schema)
+    # Get various objects that need to be amended
+    extended_types = get_extended_types(schema)
+    provides_parent_types = get_provides_parent_types(schema)
+    entities = get_entities(schema)
 
     # Add fields directives (@external, @provides, @requires)
-    for entity in provides_parent_types | set(extended_types.values()):
-        add_entity_fields_decorators(entity, schema, string_schema)
+    for entity in set(provides_parent_types.values()) | set(extended_types.values()):
+        string_schema = add_entity_fields_decorators(entity, schema, string_schema)
 
     # Prepend `extend` keyword to the type definition of extended types
     for entity_name, entity in extended_types.items():
@@ -98,11 +98,19 @@ def get_sdl(schema: Schema, custom_entities: Dict[str, Any]) -> str:
         repl_str = r"extend type %s \1" % entity_name
         string_schema = type_def.sub(repl_str, string_schema)
 
+    # Add entity sdl
+    for entity_name, entity in entities.items():
+        type_def_re = r"(type %s [^\{]*)" % entity_name
+        repl_str = r"\1 %s " % entity._sdl
+        pattern = re.compile(type_def_re)
+        string_schema = pattern.sub(repl_str, string_schema)
+
+    # print(string_schema)
     return string_schema
 
 
 def get_service_query(schema: Schema):
-    sdl_str = get_sdl(schema, custom_entities)
+    sdl_str = get_sdl(schema)
 
     class _Service(ObjectType):
         sdl = String()
