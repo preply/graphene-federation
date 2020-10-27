@@ -1,0 +1,35 @@
+language: python
+dist: xenial
+
+python:
+  - 3.5
+  - 3.6
+  - 3.7
+  - 3.8
+
+install:
+  - pip install -e ".[dev]"
+after_success:
+  - pip install coveralls
+  - coveralls
+
+stages:
+  - test
+  - integration-test
+
+script:
+  - py.test graphene_federation --cov=graphene_federation -vv
+
+jobs:
+  include:
+    - stage: test
+    - name: linting
+      python: 3.7
+      script:
+        - black graphene_federation --check
+    - stage: integration-test
+      services:
+        - docker
+      script:
+        - make integration-build
+        - make integration-test
