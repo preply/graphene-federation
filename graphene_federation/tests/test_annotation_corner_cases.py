@@ -168,6 +168,77 @@ type Query {
     )
 
 
+def test_camel_case_field_name_without_auto_camelcase():
+    """
+    Test annotation with fields that have camel cases or snake case but with the auto_camelcase disabled.
+    """
+
+    @extend("auto_camel")
+    class Camel(ObjectType):
+        auto_camel = external(String())
+        forcedCamel = requires(String(), fields="auto_camel")
+        a_snake = String()
+        aCamel = String()
+
+    class Query(ObjectType):
+        camel = Field(Camel)
+
+    schema = build_schema(query=Query, auto_camelcase=False)
+    assert (
+        str(schema)
+        == """schema {
+  query: Query
+}
+
+type Camel {
+  auto_camel: String
+  forcedCamel: String
+  a_snake: String
+  aCamel: String
+}
+
+type Query {
+  camel: Camel
+  _entities(representations: [_Any]): [_Entity]
+  _service: _Service
+}
+
+scalar _Any
+
+union _Entity = Camel
+
+type _Service {
+  sdl: String
+}
+"""
+    )
+    # Check the federation service schema definition language
+    query = """
+    query {
+        _service {
+            sdl
+        }
+    }
+    """
+    result = graphql(schema, query)
+    assert not result.errors
+    assert (
+        result.data["_service"]["sdl"].strip()
+        == """
+extend type Camel  @key(fields: "auto_camel") {
+  auto_camel: String @external
+  forcedCamel: String @requires(fields: "auto_camel")
+  a_snake: String
+  aCamel: String
+}
+
+type Query {
+  camel: Camel
+}
+""".strip()
+    )
+
+
 def test_annotated_field_also_used_in_filter():
     """
     Test that when a field also used in filter needs to get annotated, it really annotates only the field.

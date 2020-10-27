@@ -29,7 +29,7 @@ setup(
   author_email='super.hang.glider@gmail.com',
   url='https://github.com/preply/graphene-federation',
   download_url=f'https://github.com/preply/graphene-federation/archive/{version}.tar.gz',
-  keywords=['graphene', 'gql', 'federation'],
+  keywords=["graphene", "graphql", "gql", "federation"],
   install_requires=[
     "graphene>=2.1.0,<3"
   ],
