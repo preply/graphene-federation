@@ -12,7 +12,7 @@ def _get_query(schema, query_cls=None):
     if query_cls is not None:
         bases.append(query_cls)
     bases = tuple(bases)
-    federated_query_cls = type('Query', bases, {})
+    federated_query_cls = type("Query", bases, {})
     return federated_query_cls
 
 

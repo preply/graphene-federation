@@ -15,6 +15,7 @@ users = [
     {"user_id": "3", "name": "Mary", "email": "mary@mail.com"},
 ]
 
+
 @key("user_id")
 @key("email")
 class User(ObjectType):
@@ -29,11 +30,13 @@ class User(ObjectType):
             user = next(filter(lambda x: x["email"] == self.email, users))
         return User(**user)
 
+
 class UserQuery(ObjectType):
     user = Field(User, user_id=ID(required=True))
 
     def resolve_user(self, info, user_id, *args, **kwargs):
         return User(**next(filter(lambda x: x["user_id"] == user_id, users)))
+
 
 user_schema = build_schema(query=UserQuery)
 
@@ -49,9 +52,11 @@ chat_messages = [
     {"id": "6", "user_id": "2", "text": "Sorry but weather sucks so I am upset"},
 ]
 
+
 @extend("user_id")
 class ChatUser(ObjectType):
     user_id = external(ID(required=True))
+
 
 class ChatMessage(ObjectType):
     id = ID(required=True)
@@ -62,11 +67,13 @@ class ChatMessage(ObjectType):
     def resolve_user(self, info, *args, **kwargs):
         return ChatUser(user_id=self.user_id)
 
+
 class ChatQuery(ObjectType):
     message = Field(ChatMessage, id=ID(required=True))
 
     def resolve_message(self, info, id, *args, **kwargs):
         return ChatMessage(**next(filter(lambda x: x["id"] == id, chat_messages)))
+
 
 chat_schema = build_schema(query=ChatQuery)
 
@@ -74,12 +81,15 @@ chat_schema = build_schema(query=ChatQuery)
 # Tests
 # ------------------------
 
+
 def test_user_schema():
     """
     Check that the user schema has been annotated correctly
     and that a request to retrieve a user works.
     """
-    assert str(user_schema) == """schema {
+    assert (
+        str(user_schema)
+        == """schema {
   query: Query
 }
 
@@ -103,6 +113,7 @@ type _Service {
   sdl: String
 }
 """
+    )
     query = """
     query {
         user(userId: "2") {
@@ -113,13 +124,40 @@ type _Service {
     result = graphql(user_schema, query)
     assert not result.errors
     assert result.data == {"user": {"name": "Jack"}}
+    # Check the federation service schema definition language
+    query = """
+    query {
+        _service {
+            sdl
+        }
+    }
+    """
+    result = graphql(user_schema, query)
+    assert not result.errors
+    assert (
+        result.data["_service"]["sdl"].strip()
+        == """
+type User @key(fields: "email") @key(fields: "userId") {
+  userId: ID!
+  email: String!
+  name: String
+}
+
+type UserQuery {
+  user(userId: ID!): User
+}
+""".strip()
+    )
+
 
 def test_chat_schema():
     """
     Check that the chat schema has been annotated correctly
     and that a request to retrieve a chat message works.
     """
-    assert str(chat_schema) == """schema {
+    assert (
+        str(chat_schema)
+        == """schema {
   query: Query
 }
 
@@ -148,6 +186,7 @@ type _Service {
   sdl: String
 }
 """
+    )
     query = """
     query {
         message(id: "4") {
@@ -159,14 +198,32 @@ type _Service {
     result = graphql(chat_schema, query)
     assert not result.errors
     assert result.data == {"message": {"text": "Don't be rude Jack", "userId": "3"}}
+    # Check the federation service schema definition language
+    query = """
+    query {
+        _service {
+            sdl
+        }
+    }
+    """
+    result = graphql(chat_schema, query)
+    assert not result.errors
+    assert (
+        result.data["_service"]["sdl"].strip()
+        == """
+type ChatMessage {
+  id: ID!
+  text: String
+  userId: ID
+  user: ChatUser!
+}
 
+type ChatQuery {
+  message(id: ID!): ChatMessage
+}
 
-
-# Test type with external field also used in a connection
-# Test type with 2 similar looking names
-# test camel case situation
-# test basic case for extend/external/provides
-
-# Add unit testing
-# Add linting (black, flake)
-# Add typing
+extend type ChatUser  @key(fields: "userId") {
+  userId: ID! @external
+}
+""".strip()
+    )

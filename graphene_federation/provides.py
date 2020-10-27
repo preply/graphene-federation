@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
 from graphene import Field, Schema
 
@@ -18,7 +18,7 @@ def get_provides_parent_types(schema: Schema) -> Dict[str, Any]:
     return provides_parent_types
 
 
-def provides(field, fields: str = None):
+def provides(field, fields: Union[str, List[str]] = None):
     """
 
     :param field: base type (when used as decorator) or field of base type
@@ -27,8 +27,12 @@ def provides(field, fields: str = None):
     """
     if fields is None:  # used as decorator on base type
         if isinstance(field, Field):
-            raise RuntimeError("Please specify fields")
+            raise ValueError("Please specify fields")
         field._provide_parent_type = True
     else:  # used as wrapper over field
+        # TODO: We should validate the `fields` input to check it is actually existing fields but we
+        # don't have access here to the graphene type of the object it provides those fields for.
+        if isinstance(fields, str):
+            fields = fields.split()
         field._provides = fields
     return field

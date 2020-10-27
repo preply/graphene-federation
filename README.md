@@ -4,7 +4,7 @@ Federation support for graphene
 Build: [![CircleCI](https://circleci.com/gh/preply/graphene-federation.svg?style=svg)](https://circleci.com/gh/preply/graphene-federation)
 
 
-Federation specs implementation on top of Python graphene lib 
+Federation specs implementation on top of Python graphene lib
 https://www.apollographql.com/docs/apollo-server/federation/federation-spec/
 
 Based on discussion: https://github.com/graphql-python/graphene/issues/953#issuecomment-508481652
@@ -19,21 +19,21 @@ Supports now:
         class User(ObjectType):
             id = Int(required=True)
             email = String()
-        
+
             def __resolve_reference(self, info, **kwargs):
                 if self.id is not None:
                     return User(id=self.id, email=f'name_{self.id}@gmail.com')
-                return User(id=123, email=self.email)              
+                return User(id=123, email=self.email)
     ```
 * extend  # extend remote types
-* external  # mark field as external 
+* external  # mark field as external
 * requires  # mark that field resolver requires other fields to be pre-fetched
-* provides  # to annotate the expected returned fieldset from a field on a base type that is guaranteed to be selectable by the gateway. 
+* provides  # to annotate the expected returned fieldset from a field on a base type that is guaranteed to be selectable by the gateway.
     * **Base class should be decorated with `@provides`** as well as field on a base type that provides. Check example bellow:
     ```python
         import graphene
         from graphene_federation import provides
-        
+
         @provides
         class ArticleThatProvideAuthorAge(graphene.ObjectType):
             id = Int(required=True)
@@ -102,7 +102,7 @@ If not explicitly defined, default resolver is used. Default resolver just creat
 1. decorators will not work properly
 * on fields with capitalised letters with `auto_camelcase=True`, for example: `my_ABC_field = String()`
 * on fields with custom names for example `some_field = String(name='another_name')`
-
+1. `@key` decorator will not work on [compound primary key](https://www.apollographql.com/docs/federation/entities/#defining-a-compound-primary-key)
 ---------------------------
 
 For more details see [examples](examples/)
@@ -119,4 +119,4 @@ Also cool [example](https://github.com/preply/graphene-federation/issues/1) of i
 
 ---------------------------
 
-Also, you can read about how we've come to federation at Preply [here](https://medium.com/preply-engineering/apollo-federation-support-in-graphene-761a0512456d) 
+Also, you can read about how we've come to federation at Preply [here](https://medium.com/preply-engineering/apollo-federation-support-in-graphene-761a0512456d)

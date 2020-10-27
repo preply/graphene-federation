@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
 from graphene import Schema
 
@@ -21,16 +21,23 @@ def get_extended_types(schema: Schema) -> Dict[str, Any]:
 def extend(fields: str):
     """
     Decorator to use to extend a given type.
-    The fields to extend must be provided as input.
+    The field to extend must be provided as input as a string.
     """
+
     def decorator(Type):
-        if hasattr(Type, "_sdl"):
-            raise RuntimeError("Can't extend type which is already extended or has @key")
-        # Set a `_sdl` attribute so it will be registered as an entity
-        setattr(Type, "_sdl", '@key(fields: "%s")' % fields)
+        assert not hasattr(
+            Type, "_keys"
+        ), "Can't extend type which is already extended or has @key"
+        # Check the provided fields actually exist on the Type.
+        assert (
+            fields in Type._meta.fields
+        ), f'Field "{fields}" does not exist on type "{Type._meta.name}"'
+        # Set a `_keys` attribute so it will be registered as an entity
+        setattr(Type, "_keys", [fields])
         # Set a `_extended` attribute to be able to distinguish it from the other entities
         setattr(Type, "_extended", True)
         return Type
+
     return decorator
 
 
@@ -42,6 +49,18 @@ def external(field):
     return field
 
 
-def requires(field, fields: str):
+def requires(field, fields: Union[str, List[str]]):
+    """
+    Mark the required fields for a given field.
+    The input `fields` can be either a string or a list.
+    When it is a string we split at spaces to get the list of fields.
+    """
+    # TODO: We should validate the `fields` input to check it is actually existing fields but we
+    # don't have access here to the parent graphene type.
+    if isinstance(fields, str):
+        fields = fields.split()
+    assert not hasattr(
+        field, "_requires"
+    ), "Can't chain `requires()` method calls on one field."
     field._requires = fields
     return field

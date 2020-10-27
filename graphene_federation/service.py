@@ -1,13 +1,13 @@
 import re
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from packaging import version
 
 import graphene
 from graphene import ObjectType, String, Field, Schema, __version__ as graphene_version
 
-if version.parse(graphene_version) < version.parse('3.0.0'):
+if version.parse(graphene_version) < version.parse("3.0.0"):
     from graphql.utils.schema_printer import _print_fields as print_fields
 else:
     from graphql.utilities.print_schema import print_fields as print_fields
@@ -16,6 +16,7 @@ from graphene_federation.extend import get_extended_types
 from graphene_federation.provides import get_provides_parent_types
 
 from .entity import get_entities
+from .utils import field_name_to_type_attribute, type_attribute_to_field_name
 
 
 class MonoFieldType:
@@ -23,16 +24,22 @@ class MonoFieldType:
     In order to be able to reuse the `print_fields` method to get a singular field
     string definition, we need to define an object that has a `.fields` attribute.
     """
+
     def __init__(self, name, field):
-        self.fields = {
-            name: field
-        }
+        self.fields = {name: field}
+
+
+def convert_fields(schema: Schema, fields: List[str]) -> str:
+    get_field_name = type_attribute_to_field_name(schema)
+    return " ".join([get_field_name(field) for field in fields])
+
 
 DECORATORS = {
-    "_external": lambda _: "@external",
-    "_requires": lambda fields: f'@requires(fields: "{fields}")',
-    "_provides": lambda fields: f'@provides(fields: "{fields}")',
+    "_external": lambda _schema, _fields: "@external",
+    "_requires": lambda schema, fields: f'@requires(fields: "{convert_fields(schema, fields)}")',
+    "_provides": lambda schema, fields: f'@provides(fields: "{convert_fields(schema, fields)}")',
 }
+
 
 def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> str:
     """
@@ -48,28 +55,26 @@ def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> 
     entity_name = entity._meta.name
     entity_type = schema.get_type(entity_name)
     str_fields = []
-    for name, field in entity_type.fields.items():
-        str_field = print_fields(MonoFieldType(name, field))
-        f = getattr(entity, name, None)
+    get_model_attr = field_name_to_type_attribute(schema, entity)
+    for field_name, field in entity_type.fields.items():
+        str_field = print_fields(MonoFieldType(field_name, field))
+        # Check if we need to annotate the field by checking if it has the decorator attribute set on the field.
+        f = getattr(entity, get_model_attr(field_name), None)
         if f is not None:
             for decorator, decorator_resolver in DECORATORS.items():
                 decorator_value = getattr(f, decorator, None)
                 if decorator_value:
-                    str_field += f" {decorator_resolver(decorator_value)}"
+                    str_field += f" {decorator_resolver(schema, decorator_value)}"
         str_fields.append(str_field)
     str_fields_annotated = "\n".join(str_fields)
     # Replace the original field declaration by the annotated one
     str_fields_original = print_fields(entity_type)
     pattern = re.compile(
-        r"(type\s%s\s[^\{]*)\{\s*%s\s*\}" % (
-            entity_name, re.escape(str_fields_original)
-        )
+        r"(type\s%s\s[^\{]*)\{\s*%s\s*\}"
+        % (entity_name, re.escape(str_fields_original))
     )
     string_schema_original = string_schema + ""
-    string_schema = pattern.sub(
-        r"\g<1> {\n%s\n}" % str_fields_annotated,
-        string_schema
-    )
+    string_schema = pattern.sub(r"\g<1> {\n%s\n}" % str_fields_annotated, string_schema)
     return string_schema
 
 
@@ -98,14 +103,17 @@ def get_sdl(schema: Schema) -> str:
         repl_str = r"extend type %s \1" % entity_name
         string_schema = type_def.sub(repl_str, string_schema)
 
-    # Add entity sdl
+    # Add entity keys declarations
+    get_field_name = type_attribute_to_field_name(schema)
     for entity_name, entity in entities.items():
         type_def_re = r"(type %s [^\{]*)" % entity_name
-        repl_str = r"\1 %s " % entity._sdl
+        type_annotation = " ".join(
+            [f'@key(fields: "{get_field_name(key)}")' for key in entity._keys]
+        )
+        repl_str = r"\1%s " % type_annotation
         pattern = re.compile(type_def_re)
         string_schema = pattern.sub(repl_str, string_schema)
 
-    # print(string_schema)
     return string_schema
 
 

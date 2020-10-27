@@ -11,14 +11,22 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Build
-          command: make build
+    - run:
+        name: Linting
+        command: black graphene_federation --check
 
-      - run:
-          name: Tests
-          command: make test
+    - run:
+        name: Unit Tests
+        command: make tests
 
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
+    - run:
+        name: Integration Build
+        command: make integration-build
+
+    - run:
+        name: Integration Tests
+        command: make integration-test
+
+    - store_artifacts:
+        path: test-reports
+        destination: test-reports
