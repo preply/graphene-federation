@@ -17,20 +17,20 @@ after_success:
   - coveralls
 
 stages:
+  - linting
   - test
   - integration-test
-  - linting
-
 
 jobs:
   include:
     - stage: linting
-      python: 3.7
+      python: 3.8
       install:
         - pip install -e ".[dev]"
       script:
         - black graphene_federation --check
     - stage: integration-test
+      python: 3.8
       services:
         - docker
       script:
