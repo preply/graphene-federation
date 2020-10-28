@@ -2,15 +2,10 @@ import re
 
 from typing import Any, Dict, List
 
-from packaging import version
-
 import graphene
-from graphene import ObjectType, String, Field, Schema, __version__ as graphene_version
+from graphene import ObjectType, String, Field, Schema
 
-if version.parse(graphene_version) < version.parse("3.0.0"):
-    from graphql.utils.schema_printer import _print_fields as print_fields
-else:
-    from graphql.utilities.print_schema import print_fields as print_fields
+from graphql.utils.schema_printer import _print_fields as print_fields
 
 from graphene_federation.extend import get_extended_types
 from graphene_federation.provides import get_provides_parent_types
