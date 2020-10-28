@@ -2,8 +2,8 @@
 
 Federation support for ![Graphene Logo](http://graphene-python.org/favicon.png) [Graphene](http://graphene-python.org) following the [Federation specifications](https://www.apollographql.com/docs/apollo-server/federation/federation-spec/).
 
-Build [![Build Status](https://travis-ci.com/tcleonard/graphene-federation.svg?branch=master)](https://travis-ci.com/tcleonard/graphene-federation)
-Coverage: [![Coverage Status](https://coveralls.io/repos/github/tcleonard/graphene-federation/badge.svg)](https://coveralls.io/github/tcleonard/graphene-federation)
+[![Build Status](https://travis-ci.com/tcleonard/graphene-federation.svg?branch=master)](https://travis-ci.com/tcleonard/graphene-federation)
+[![Coverage Status](https://coveralls.io/repos/github/tcleonard/graphene-federation/badge.svg)](https://coveralls.io/github/tcleonard/graphene-federation)
 
 Based on discussion: https://github.com/graphql-python/graphene/issues/953#issuecomment-508481652
 
@@ -145,7 +145,8 @@ print(result.data["_service"]["sdl"])
 
 Those can then be used in a federated schema.
 
-You can find more examples in the unit / integration tests and [examples folder](examples/)
+You can find more examples in the unit / integration tests and [examples folder](examples/).
+
 There is also a cool [example](https://github.com/preply/graphene-federation/issues/1) of integration with Mongoengine.
 
 ------------------------
