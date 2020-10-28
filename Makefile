@@ -16,7 +16,7 @@ integration-test:
 
 .PHONY: dev-setup ## Install development dependencies
 dev-setup:
-	docker-compose up -d
+	docker-compose up -d && docker-compose exec graphene_federation bash
 
 .PHONY: tests ## Run unit tests
 tests:
