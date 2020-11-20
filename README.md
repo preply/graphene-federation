@@ -2,8 +2,14 @@
 
 Federation support for ![Graphene Logo](http://graphene-python.org/favicon.png) [Graphene](http://graphene-python.org) following the [Federation specifications](https://www.apollographql.com/docs/apollo-server/federation/federation-spec/).
 
-[![Build Status](https://travis-ci.com/tcleonard/graphene-federation.svg?branch=master)](https://travis-ci.com/tcleonard/graphene-federation)
-[![Coverage Status](https://coveralls.io/repos/github/tcleonard/graphene-federation/badge.svg)](https://coveralls.io/github/tcleonard/graphene-federation)
+[![Build Status][build-image]][build-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
+
+[build-image]: https://github.com/loft-orbital/graphene-federation/workflows/Unit%20Tests/badge.svg?branch=loft-master
+[build-url]: https://github.com/loft-orbital/graphene-federation/actions
+[coveralls-image]: https://coveralls.io/repos/github/tcleonard/graphene-federation/badge.svg?branch=loft-master
+[coveralls-url]: https://coveralls.io/repos/github/tcleonard/graphene-federation?branch=loft-master
+
 
 Based on discussion: https://github.com/graphql-python/graphene/issues/953#issuecomment-508481652
 
