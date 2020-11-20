@@ -7,8 +7,8 @@ Federation support for ![Graphene Logo](http://graphene-python.org/favicon.png) 
 
 [build-image]: https://github.com/loft-orbital/graphene-federation/workflows/Unit%20Tests/badge.svg?branch=loft-master
 [build-url]: https://github.com/loft-orbital/graphene-federation/actions
-[coveralls-image]: https://coveralls.io/repos/github/tcleonard/graphene-federation/badge.svg?branch=loft-master
-[coveralls-url]: https://coveralls.io/repos/github/tcleonard/graphene-federation?branch=loft-master
+[coveralls-image]: https://coveralls.io/repos/github/loft-orbital/graphene-federation/badge.svg?branch=loft-master
+[coveralls-url]: https://coveralls.io/github/loft-orbital/graphene-federation?branch=loft-master
 
 
 Based on discussion: https://github.com/graphql-python/graphene/issues/953#issuecomment-508481652

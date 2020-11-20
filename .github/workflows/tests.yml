@@ -23,7 +23,7 @@ jobs:
     - name: Run Unit Tests
       run: py.test graphene_federation --cov=graphene_federation -vv
     - name: Upload Coverage
-      run: |
-        pip install coveralls
-        coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
