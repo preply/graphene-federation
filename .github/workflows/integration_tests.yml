@@ -1,0 +1,14 @@
+name: Integration Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build environment
+      run: make integration-build
+    - name: Run Integration Tests
+      run: make integration-test
