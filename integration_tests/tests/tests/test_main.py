@@ -89,8 +89,8 @@ def fetch_sdl(service_name='service_b'):
 
 def test_key_decorator_applied_by_exact_match_only():
     sdl = fetch_sdl()
-    assert 'type FileNode  @key(fields: "id")' in sdl
-    assert 'type FileNodeAnother  @key(fields: "id")' not in sdl
+    assert 'type FileNode @key(fields: "id")' in sdl
+    assert 'type FileNodeAnother @key(fields: "id")' not in sdl
 
 
 def test_mutation_is_accessible_in_federation():
@@ -112,12 +112,12 @@ def test_mutation_is_accessible_in_federation():
 
 def test_multiple_key_decorators_apply_multiple_key_annotations():
     sdl = fetch_sdl()
-    assert 'type User  @key(fields: "id") @key(fields: "primaryEmail")' in sdl
+    assert 'type User @key(fields: "primaryEmail") @key(fields: "id")' in sdl
 
 
 def test_avoid_duplication_of_key_decorator():
     sdl = fetch_sdl('service_a')
-    assert 'extend type FileNode   @key(fields: \"id\") {' in sdl
+    assert 'extend type FileNode  @key(fields: \"id\") {' in sdl
 
 
 def test_requires():
