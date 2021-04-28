@@ -31,6 +31,8 @@ At the moment it supports:
 
 Each type which is decorated with `@key` or `@extend` is added to the `_Entity` union.
 The [`__resolve_reference` method](https://www.apollographql.com/docs/federation/api/apollo-federation/#__resolvereference) can be defined for each type that is an entity.
+Note that since the notation with double underscores can be problematic in Python for model inheritance this resolver method can also be named `_resolve_reference` (the `__resolve_reference` method will take precedence if both are declared).
+
 This method is called whenever an entity is requested as part of the fulfilling a query plan.
 If not explicitly defined, the default resolver is used.
 The default resolver just creates instance of type with passed fieldset as kwargs, see [`entity.get_entity_query`](graphene_federation/entity.py) for more details
