@@ -64,8 +64,9 @@ def get_entity_query(schema: Schema):
                     }
                 model_instance = model(**model_arguments)
 
-                resolver = getattr(model, "_%s__resolve_reference" % model.__name__, None) or \
-                    getattr(model, "_resolve_reference", None)
+                resolver = getattr(
+                    model, "_%s__resolve_reference" % model.__name__, None
+                ) or getattr(model, "_resolve_reference", None)
                 if resolver:
                     model_instance = resolver(model_instance, info)
 
