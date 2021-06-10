@@ -4,6 +4,7 @@ from graphql import graphql
 
 from graphene import ObjectType, ID, String, Field
 
+from .. import graphql_compatibility
 from ..entity import key
 from ..main import build_schema
 
@@ -20,7 +21,7 @@ def test_multiple_keys():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -53,7 +54,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()

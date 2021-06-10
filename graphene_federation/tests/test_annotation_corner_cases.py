@@ -4,6 +4,7 @@ from graphql import graphql
 
 from graphene import ObjectType, ID, String, Field
 
+from .. import graphql_compatibility
 from ..entity import key
 from ..extend import extend, external, requires
 from ..main import build_schema
@@ -31,7 +32,7 @@ def test_similar_field_name():
 
     chat_schema = build_schema(query=ChatQuery)
     assert (
-        str(chat_schema)
+        graphql_compatibility.get_schema_str(chat_schema)
         == """schema {
   query: Query
 }
@@ -72,7 +73,7 @@ type _Service {
         }
     }
     """
-    result = graphql(chat_schema, query)
+    result = graphql_compatibility.perform_graphql_query(chat_schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()
@@ -114,7 +115,7 @@ def test_camel_case_field_name():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -149,7 +150,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()
@@ -185,7 +186,7 @@ def test_camel_case_field_name_without_auto_camelcase():
 
     schema = build_schema(query=Query, auto_camelcase=False)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -220,7 +221,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()
@@ -259,7 +260,7 @@ def test_annotated_field_also_used_in_filter():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -296,7 +297,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()
@@ -338,7 +339,7 @@ def test_annotate_object_with_meta_name():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -375,7 +376,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()

@@ -21,3 +21,4 @@ dev-setup:
 .PHONY: tests ## Run unit tests
 tests:
 	docker-compose run graphene_federation py.test graphene_federation --cov=graphene_federation -vv
+

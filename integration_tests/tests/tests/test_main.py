@@ -15,6 +15,7 @@ def test_integrate_simple_schema():
     assert response.status_code == 200
     data = json.loads(response.content)['data']
     assert data['goodbye'] == 'See ya!'
+    print("qwerty")
 
 
 def test_external_types():

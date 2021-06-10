@@ -2,6 +2,7 @@ from graphql import graphql
 
 from graphene import Field, Int, ObjectType, String
 
+from .. import graphql_compatibility
 from ..provides import provides
 from ..main import build_schema
 from ..extend import extend, external
@@ -28,7 +29,7 @@ def test_provides():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -67,7 +68,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()
@@ -111,7 +112,7 @@ def test_provides_multiple_fields():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -150,7 +151,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()
@@ -194,7 +195,7 @@ def test_provides_multiple_fields_as_list():
 
     schema = build_schema(query=Query)
     assert (
-        str(schema)
+        graphql_compatibility.get_schema_str(schema)
         == """schema {
   query: Query
 }
@@ -233,7 +234,7 @@ type _Service {
         }
     }
     """
-    result = graphql(schema, query)
+    result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
     assert (
         result.data["_service"]["sdl"].strip()

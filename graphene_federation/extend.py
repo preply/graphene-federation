@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Union
 
 from graphene import Schema
 
+from graphene_federation import graphql_compatibility
+
 
 def get_extended_types(schema: Schema) -> Dict[str, Any]:
     """
@@ -10,7 +12,7 @@ def get_extended_types(schema: Schema) -> Dict[str, Any]:
     the `@extend` decorator adds a `_extended` attribute to them.
     """
     extended_types = {}
-    for type_name, type_ in schema._type_map.items():
+    for type_name, type_ in graphql_compatibility.get_type_map_from_schema(schema).items():
         if not hasattr(type_, "graphene_type"):
             continue
         if getattr(type_.graphene_type, "_extended", False):
