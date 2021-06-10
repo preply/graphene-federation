@@ -183,6 +183,246 @@ extend type Camel  @key(fields: "autoCamel") {
 }
 """
 
+NOAUTOCAMELCASE_SCHEMA_2 = """schema {
+  query: Query
+}
+
+type Camel {
+  auto_camel: String
+  forcedCamel: String
+  a_snake: String
+  aCamel: String
+}
+
+type Query {
+  camel: Camel
+  _entities(representations: [_Any]): [_Entity]
+  _service: _Service
+}
+
+scalar _Any
+
+union _Entity = Camel
+
+type _Service {
+  sdl: String
+}
+"""
+NOAUTOCAMELCASE_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  camel: Camel
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type Camel {
+  auto_camel: String
+  forcedCamel: String
+  a_snake: String
+  aCamel: String
+}
+
+union _Entity = Camel
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+NOAUTOCAMELCASE_RESPONSE_2 = """
+extend type Camel  @key(fields: "auto_camel") {
+  auto_camel: String @external
+  forcedCamel: String @requires(fields: "auto_camel")
+  a_snake: String
+  aCamel: String
+}
+
+type Query {
+  camel: Camel
+}
+"""
+NOAUTOCAMELCASE_RESPONSE_3 = """type Query {
+  camel: Camel
+}
+
+extend type Camel  @key(fields: "auto_camel") {
+  auto_camel: String @external
+  forcedCamel: String @requires(fields: "auto_camel")
+  a_snake: String
+  aCamel: String
+}
+"""
+
+FILTER_SCHEMA_2 = """schema {
+  query: Query
+}
+
+type A {
+  id: ID
+  b(id: ID): B
+}
+
+type B {
+  id: ID
+}
+
+type Query {
+  a: A
+  _entities(representations: [_Any]): [_Entity]
+  _service: _Service
+}
+
+scalar _Any
+
+union _Entity = A | B
+
+type _Service {
+  sdl: String
+}
+"""
+FILTER_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  a: A
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type A {
+  id: ID
+  b(id: ID = null): B
+}
+
+type B {
+  id: ID
+}
+
+union _Entity = A | B
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+FILTER_RESPONSE_2 = """
+extend type A  @key(fields: "id") {
+  id: ID @external
+  b(id: ID): B
+}
+
+type B @key(fields: "id") {
+  id: ID
+}
+
+type Query {
+  a: A
+}
+"""
+FILTER_RESPONSE_3 = """type Query {
+  a: A
+}
+
+extend type A  @key(fields: "id") {
+  id: ID @external
+  b(id: ID = null): B
+}
+
+type B @key(fields: "id") {
+  id: ID
+}
+"""
+
+METANAME_SCHEMA_2 = """schema {
+  query: Query
+}
+
+type Banana {
+  id: ID
+  b(id: ID): Potato
+}
+
+type Potato {
+  id: ID
+}
+
+type Query {
+  a: Banana
+  _entities(representations: [_Any]): [_Entity]
+  _service: _Service
+}
+
+scalar _Any
+
+union _Entity = Banana | Potato
+
+type _Service {
+  sdl: String
+}
+"""
+METANAME_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  a: Banana
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type Banana {
+  id: ID
+  b(id: ID = null): Potato
+}
+
+type Potato {
+  id: ID
+}
+
+union _Entity = Banana | Potato
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+METANAME_RESPONSE_2 = """
+extend type Banana  @key(fields: "id") {
+  id: ID @external
+  b(id: ID): Potato
+}
+
+type Potato @key(fields: "id") {
+  id: ID
+}
+
+type Query {
+  a: Banana
+}
+"""
+METANAME_RESPONSE_3 = """type Query {
+  a: Banana
+}
+
+extend type Banana  @key(fields: "id") {
+  id: ID @external
+  b(id: ID = null): Potato
+}
+
+type Potato @key(fields: "id") {
+  id: ID
+}
+"""
 
 def test_similar_field_name():
     """
@@ -283,33 +523,10 @@ def test_camel_case_field_name_without_auto_camelcase():
         camel = Field(Camel)
 
     schema = build_schema(query=Query, auto_camelcase=False)
-    assert (
-        graphql_compatibility.get_schema_str(schema)
-        == """schema {
-  query: Query
-}
-
-type Camel {
-  auto_camel: String
-  forcedCamel: String
-  a_snake: String
-  aCamel: String
-}
-
-type Query {
-  camel: Camel
-  _entities(representations: [_Any]): [_Entity]
-  _service: _Service
-}
-
-scalar _Any
-
-union _Entity = Camel
-
-type _Service {
-  sdl: String
-}
-"""
+    graphql_compatibility.assert_schema_is(
+        actual=schema,
+        expected_2=NOAUTOCAMELCASE_SCHEMA_2,
+        expected_3=NOAUTOCAMELCASE_SCHEMA_3,
     )
     # Check the federation service schema definition language
     query = """
@@ -321,20 +538,11 @@ type _Service {
     """
     result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
-extend type Camel  @key(fields: "auto_camel") {
-  auto_camel: String @external
-  forcedCamel: String @requires(fields: "auto_camel")
-  a_snake: String
-  aCamel: String
-}
-
-type Query {
-  camel: Camel
-}
-""".strip()
+    graphql_compatibility.assert_graphql_response_data(
+        schema=schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=NOAUTOCAMELCASE_RESPONSE_2,
+        expected_3=NOAUTOCAMELCASE_RESPONSE_3,
     )
 
 
@@ -357,35 +565,10 @@ def test_annotated_field_also_used_in_filter():
         a = Field(A)
 
     schema = build_schema(query=Query)
-    assert (
-        graphql_compatibility.get_schema_str(schema)
-        == """schema {
-  query: Query
-}
-
-type A {
-  id: ID
-  b(id: ID): B
-}
-
-type B {
-  id: ID
-}
-
-type Query {
-  a: A
-  _entities(representations: [_Any]): [_Entity]
-  _service: _Service
-}
-
-scalar _Any
-
-union _Entity = A | B
-
-type _Service {
-  sdl: String
-}
-"""
+    graphql_compatibility.assert_schema_is(
+        actual=schema,
+        expected_2=FILTER_SCHEMA_2,
+        expected_3=FILTER_SCHEMA_3,
     )
     # Check the federation service schema definition language
     query = """
@@ -397,22 +580,11 @@ type _Service {
     """
     result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
-extend type A  @key(fields: "id") {
-  id: ID @external
-  b(id: ID): B
-}
-
-type B @key(fields: "id") {
-  id: ID
-}
-
-type Query {
-  a: A
-}
-""".strip()
+    graphql_compatibility.assert_graphql_response_data(
+        schema=schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=FILTER_RESPONSE_2,
+        expected_3=FILTER_RESPONSE_3,
     )
 
 
@@ -436,35 +608,10 @@ def test_annotate_object_with_meta_name():
         a = Field(A)
 
     schema = build_schema(query=Query)
-    assert (
-        graphql_compatibility.get_schema_str(schema)
-        == """schema {
-  query: Query
-}
-
-type Banana {
-  id: ID
-  b(id: ID): Potato
-}
-
-type Potato {
-  id: ID
-}
-
-type Query {
-  a: Banana
-  _entities(representations: [_Any]): [_Entity]
-  _service: _Service
-}
-
-scalar _Any
-
-union _Entity = Banana | Potato
-
-type _Service {
-  sdl: String
-}
-"""
+    graphql_compatibility.assert_schema_is(
+        actual=schema,
+        expected_2=METANAME_SCHEMA_2,
+        expected_3=METANAME_SCHEMA_3,
     )
     # Check the federation service schema definition language
     query = """
@@ -476,20 +623,9 @@ type _Service {
     """
     result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
-extend type Banana  @key(fields: "id") {
-  id: ID @external
-  b(id: ID): Potato
-}
-
-type Potato @key(fields: "id") {
-  id: ID
-}
-
-type Query {
-  a: Banana
-}
-""".strip()
+    graphql_compatibility.assert_graphql_response_data(
+        schema=schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=METANAME_RESPONSE_2,
+        expected_3=METANAME_RESPONSE_3,
     )
