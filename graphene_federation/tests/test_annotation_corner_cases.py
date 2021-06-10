@@ -9,31 +9,7 @@ from ..entity import key
 from ..extend import extend, external, requires
 from ..main import build_schema
 
-
-def test_similar_field_name():
-    """
-    Test annotation with fields that have similar names.
-    """
-
-    @extend("id")
-    class ChatUser(ObjectType):
-        uid = ID()
-        identified = ID()
-        id = external(ID())
-        i_d = ID()
-        ID = ID()
-
-    class ChatMessage(ObjectType):
-        id = ID(required=True)
-        user = Field(ChatUser)
-
-    class ChatQuery(ObjectType):
-        message = Field(ChatMessage, id=ID(required=True))
-
-    chat_schema = build_schema(query=ChatQuery)
-    assert (
-        graphql_compatibility.get_schema_str(chat_schema)
-        == """schema {
+SIMILAR_FIELD_SCHEMA_2 = """schema {
   query: Query
 }
 
@@ -64,20 +40,39 @@ type _Service {
   sdl: String
 }
 """
-    )
-    # Check the federation service schema definition language
-    query = """
-    query {
-        _service {
-            sdl
-        }
-    }
-    """
-    result = graphql_compatibility.perform_graphql_query(chat_schema, query)
-    assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
+SIMILAR_FIELD_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  message(id: ID!): ChatMessage
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type ChatMessage {
+  id: ID!
+  user: ChatUser
+}
+
+type ChatUser {
+  uid: ID
+  identified: ID
+  id: ID
+  iD: ID
+  ID: ID
+}
+
+union _Entity = ChatUser
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+SIMILAR_FIELD_RESPONSE_2 = """
 type ChatMessage {
   id: ID!
   user: ChatUser
@@ -94,29 +89,26 @@ extend type ChatUser  @key(fields: "id") {
   iD: ID
   ID: ID
 }
-""".strip()
-    )
+"""
+SIMILAR_FIELD_RESPONSE_3 = """type ChatQuery {
+  message(id: ID!): ChatMessage
+}
 
+type ChatMessage {
+  id: ID!
+  user: ChatUser
+}
 
-def test_camel_case_field_name():
-    """
-    Test annotation with fields that have camel cases or snake case.
-    """
+extend type ChatUser  @key(fields: "id") {
+  uid: ID
+  identified: ID
+  id: ID @external
+  iD: ID
+  ID: ID
+}
+"""
 
-    @extend("auto_camel")
-    class Camel(ObjectType):
-        auto_camel = external(String())
-        forcedCamel = requires(String(), fields="auto_camel")
-        a_snake = String()
-        aCamel = String()
-
-    class Query(ObjectType):
-        camel = Field(Camel)
-
-    schema = build_schema(query=Query)
-    assert (
-        graphql_compatibility.get_schema_str(schema)
-        == """schema {
+CAMELCASE_SCHEMA_2 = """schema {
   query: Query
 }
 
@@ -141,6 +133,121 @@ type _Service {
   sdl: String
 }
 """
+CAMELCASE_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  camel: Camel
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type Camel {
+  autoCamel: String
+  forcedCamel: String
+  aSnake: String
+  aCamel: String
+}
+
+union _Entity = Camel
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+CAMELCASE_RESPONSE_2 = """
+extend type Camel  @key(fields: "autoCamel") {
+  autoCamel: String @external
+  forcedCamel: String @requires(fields: "autoCamel")
+  aSnake: String
+  aCamel: String
+}
+
+type Query {
+  camel: Camel
+}
+"""
+CAMELCASE_RESPONSE_3 = """type Query {
+  camel: Camel
+}
+
+extend type Camel  @key(fields: "autoCamel") {
+  autoCamel: String @external
+  forcedCamel: String @requires(fields: "autoCamel")
+  aSnake: String
+  aCamel: String
+}
+"""
+
+
+def test_similar_field_name():
+    """
+    Test annotation with fields that have similar names.
+    """
+
+    @extend("id")
+    class ChatUser(ObjectType):
+        uid = ID()
+        identified = ID()
+        id = external(ID())
+        i_d = ID()
+        ID = ID()
+
+    class ChatMessage(ObjectType):
+        id = ID(required=True)
+        user = Field(ChatUser)
+
+    class ChatQuery(ObjectType):
+        message = Field(ChatMessage, id=ID(required=True))
+
+    chat_schema = build_schema(query=ChatQuery)
+    graphql_compatibility.assert_schema_is(
+        actual=chat_schema,
+        expected_2=SIMILAR_FIELD_SCHEMA_2,
+        expected_3=SIMILAR_FIELD_SCHEMA_3,
+    )
+    # Check the federation service schema definition language
+    query = """
+    query {
+        _service {
+            sdl
+        }
+    }
+    """
+    result = graphql_compatibility.perform_graphql_query(chat_schema, query)
+    assert not result.errors
+    graphql_compatibility.assert_graphql_response_data(
+        schema=chat_schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=SIMILAR_FIELD_RESPONSE_2,
+        expected_3=SIMILAR_FIELD_RESPONSE_3,
+    )
+
+
+def test_camel_case_field_name():
+    """
+    Test annotation with fields that have camel cases or snake case.
+    """
+
+    @extend("auto_camel")
+    class Camel(ObjectType):
+        auto_camel = external(String())
+        forcedCamel = requires(String(), fields="auto_camel")
+        a_snake = String()
+        aCamel = String()
+
+    class Query(ObjectType):
+        camel = Field(Camel)
+
+    schema = build_schema(query=Query)
+    graphql_compatibility.assert_schema_is(
+        actual=schema,
+        expected_2=CAMELCASE_SCHEMA_2,
+        expected_3=CAMELCASE_SCHEMA_3,
     )
     # Check the federation service schema definition language
     query = """
@@ -152,20 +259,11 @@ type _Service {
     """
     result = graphql_compatibility.perform_graphql_query(schema, query)
     assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
-extend type Camel  @key(fields: "autoCamel") {
-  autoCamel: String @external
-  forcedCamel: String @requires(fields: "autoCamel")
-  aSnake: String
-  aCamel: String
-}
-
-type Query {
-  camel: Camel
-}
-""".strip()
+    graphql_compatibility.assert_graphql_response_data(
+        schema=schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=CAMELCASE_RESPONSE_2,
+        expected_3=CAMELCASE_RESPONSE_3,
     )
 
 

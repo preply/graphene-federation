@@ -3,7 +3,7 @@ Allows the project to interact to graphql using both graphene 2.1.8 and 3.0.0b7.
 Other function to preserve backwards compatibiolity may be added in the future
 """
 import itertools
-from typing import Dict, Optional, Callable
+from typing import Dict, Optional, Callable, Union
 
 from graphene import Schema
 from graphene.types.schema import TypeMap
@@ -42,9 +42,9 @@ def assert_schema_is(actual: Schema, expected_2: str, expected_3: str):
     major = get_graphene_version(actual)
     actual_str = get_schema_str(actual)
     if major == 2:
-        assert actual_str == expected_2, f"\n{actual_str}\n!=\n{expected_2}"
+        assert actual_str == expected_2, f"\n{actual_str}\n!=\n{expected_2}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual_str.strip(), expected_2.strip()))))}"
     elif major == 3:
-        assert actual_str == expected_3, f"\n{actual_str}\n!=\n{expected_3}"
+        assert actual_str == expected_3, f"\n{actual_str}\n!=\n{expected_3}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual_str.strip(), expected_3.strip()))))}"
     else:
         assert False, f"invalid major version {major}"
 
@@ -59,15 +59,36 @@ def assert_graphql_response_data(schema: Schema, actual: str, expected_2: str, e
         raise ValueError(f"invalid graphene major version {major}")
 
 
-def call_schema_print_fields(schema: Schema, t: any) -> Dict[str, any]:
+def call_schema_print_fields(schema: Schema, t: type) -> Dict[str, any]:
     major = get_graphene_version(schema)
     if major == 2:
-        from graphql.utils.schema_printer import _print_fields as print_fields
+        from graphql.utils.schema_printer import _print_fields as print_fields, _print_args, _print_deprecated
+
+        # TODO remove
+        # def _print_fields_copy(type: Union["GraphQLObjectType", "GraphQLInterfaceType"]) -> str:
+        #     return "\n".join(f"  {f_name}{_print_args(f)}: {f.type}{_print_deprecated(f)}" for f_name, f in type.fields.items())
+        #return _print_fields_copy(t)
+        return print_fields(t) # yields ' userId: ID!\n '
+
     elif major == 3:
-        from graphql.utilities.print_schema import print_fields
+        from graphql.utilities.print_schema import print_fields, print_description, print_args, print_deprecated
+
+        # copy of print_fields from graphene 3.0.0 where we avoid calling print_blocks
+        def print_fields_compliant(_type: any):
+            fields = [
+                print_description(field, "  ", not i)
+                + f"  {name}"
+                + print_args(field.args, "  ")
+                + f": {field.type}"
+                + print_deprecated(field.deprecation_reason)
+                for i, (name, field) in enumerate(_type.fields.items())
+            ]
+            return "\n".join(fields)
+
+        return print_fields_compliant(t)
     else:
         raise ValueError(f"invalid graphene major version {major}")
-    return print_fields(t)
+
 
 
 def get_schema_str(schema: Schema) -> str:

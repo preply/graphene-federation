@@ -242,7 +242,7 @@ type ChatMessage {
   user: ChatUser!
 }
 
-extend type ChatUser @key(fields: "userId") {
+extend type ChatUser  @key(fields: "userId") {
   userId: ID! @external
 }
 """
