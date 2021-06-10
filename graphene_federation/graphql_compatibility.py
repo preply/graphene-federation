@@ -149,7 +149,13 @@ def is_schema_in_auto_camelcase(schema: Schema) -> bool:
         return schema.auto_camelcase
     elif major == 3:
         # I don't know a method to detect whether auto_camelcase has been activated in graphene. Generating the default
-        return True
+        # To manage that, I hardcoded the auto_camelcase when creating the schema, since such information is not stored
+        # in the datastructures of graphene (AFAIK)
+        if hasattr(schema, "auto_camelcase"):
+            return schema.auto_camelcase
+        else:
+            # Otherwise we trat it as the camel case is set
+            return True
     else:
         raise ValueError(f"invalid graphene major version {major}")
 
