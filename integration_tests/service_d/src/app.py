@@ -1,6 +1,13 @@
+import pkg_resources
 from flask import Flask
 
-from flask_graphql import GraphQLView
+
+for x in ["graphql-server", "graphql-core", "flask", "graphene"]:
+    print(f"{x} version is {pkg_resources.get_distribution(x).version}")
+
+
+from graphql_server.flask import GraphQLView
+# from flask_graphql import GraphQLView
 from schema import schema
 
 app = Flask(__name__)
