@@ -34,6 +34,11 @@ def extend(fields: str):
         assert (
             fields in Type._meta.fields
         ), f'Field "{fields}" does not exist on type "{Type._meta.name}"'
+        if hasattr(Type._meta, "description") and Type._meta.description is not None:
+            raise ValueError(f"""{Type.__name__} has a non empty description and it is also marked with extend. 
+                They are mututally exclusive. 
+                See https://github.com/graphql/graphql-js/issues/2385#issuecomment-577997521"""
+            )
         # Set a `_keys` attribute so it will be registered as an entity
         setattr(Type, "_keys", [fields])
         # Set a `_extended` attribute to be able to distinguish it from the other entities
