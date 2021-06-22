@@ -56,7 +56,6 @@ def get_entity_query(schema: Schema):
             for representation in representations:
                 # old type_ = schema.get_type(representation["__typename"])
                 type_ = graphql_compatibility.call_schema_get_type(schema, representation["__typename"])
-                type_ = schema.get_type(representation["__typename"])
                 model = type_.graphene_type
                 model_arguments = representation.copy()
                 model_arguments.pop("__typename")
