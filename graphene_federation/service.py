@@ -18,7 +18,7 @@ def _mark_field(
             # todo write tests on regexp
             schema_field_name = to_camel_case(field_name) if auto_camelcase else field_name
             pattern = re.compile(
-                r"(type\s%s\s[^\{]*\{[^\}]*\s%s[\s]*:[\s]*[^\s]+)(\s)" % (
+                r"(type\s%s\s[^\{]*\{[^\}]*\s%s[\s]*(\([^\)]*\))?[\s]*:[\s]*[^\s]+)(\s)" % (
                     entity_name, schema_field_name))
             schema = pattern.sub(
                 rf'\g<1> {decorator_resolver(getattr(field, mark_attr_name))} ', schema)
