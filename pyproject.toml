@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "graphene-federation"
+authors = ["Igor Kasianov <super.hang.glider@gmail.com>", "Thomas Leonard", "Sean Quinn"]
+version = "0.2.0"
+license = "MIT"
+repository = "https://github.com/swquinn/graphene-federation"
+description = "Federation implementation for Graphene GraphQL"
+readme = "README.md"
+keywords = ["graphene", "graphql", "gql", "federation"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Programming Language :: Python :: 3.6",
+]
+include = ["README.md", "LICENSE"]
+exclude = ["**/tests"]
+
+[tool.poetry.urls]
+"Releases" = "https://github.com/swquinn/graphene-federation/releases"
+
+[tool.poetry.dependencies]
+python = "^3.6.2"
+graphene = ">=2.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+flake8 = "^4.0.1"
+pytest = "^7.0.1"
+pytest-cov = "^3.0.0"
+requests = "^2.27.1"
+
+[build-system]
+requires = ["poetry_core>=1.0"]
+build-backend = "poetry.core.masonry.api"

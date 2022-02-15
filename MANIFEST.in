@@ -1,5 +1,0 @@
-include README.md LICENSE.txt
-graft graphene_federation
-global-exclude __pycache__
-global-exclude *.py[co]
-prune */.idea
