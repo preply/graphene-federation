@@ -6,4 +6,4 @@ services:
     build:
       context: .
     volumes:
-      - ./:/workdir
+      - ./:/opt/graphene_federation
