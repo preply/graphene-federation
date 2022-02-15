@@ -7,10 +7,10 @@ services:
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
     healthcheck:
-      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      test: curl http://0.0.0.0:5000/graphql -H "Content-Type:application/json" --data '{"query":"{__schema { types {name} }}"}'
       interval: 1s
       timeout: 10s
-      retries: 10
+      retries: 20
 
   service_b:
     build: service_b/.
@@ -19,10 +19,10 @@ services:
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
     healthcheck:
-      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      test: curl http://0.0.0.0:5000/graphql -H "Content-Type:application/json" --data '{"query":"{__schema { types {name} }}"}'
       interval: 1s
       timeout: 10s
-      retries: 10
+      retries: 20
 
   service_c:
     build: service_c/.
@@ -31,10 +31,10 @@ services:
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
     healthcheck:
-      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      test: curl http://0.0.0.0:5000/graphql -H "Content-Type:application/json" --data '{"query":"{__schema { types {name} }}"}'
       interval: 1s
       timeout: 10s
-      retries: 10
+      retries: 20
 
   service_d:
     build: service_d/.
@@ -43,10 +43,10 @@ services:
       - ../:/project/federation_deps
     command: sh -c "pip install ./federation_deps && python ./src/app.py"
     healthcheck:
-      test: ["CMD", "curl", "-XGET", "http://0.0.0.0:5000/graphql"]
+      test: curl http://0.0.0.0:5000/graphql -H "Content-Type:application/json" --data '{"query":"{__schema { types {name} }}"}'
       interval: 1s
       timeout: 10s
-      retries: 10
+      retries: 20
 
   federation:
     build: federation/.
@@ -55,7 +55,7 @@ services:
     ports:
       - 3000:3000
     healthcheck:
-      test: ["CMD", "curl", "-f", "-XGET", "http://localhost:3000/.well-known/apollo/server-health"]
+      test: curl -f http://localhost:3000/.well-known/apollo/server-health
       interval: 3s
       timeout: 10s
       retries: 5

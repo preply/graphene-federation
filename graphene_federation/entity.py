@@ -1,49 +1,73 @@
-from graphene import List, Union
-from graphene.utils.str_converters import to_snake_case
+from typing import Any, Dict, Union
+
+from graphene import List, Union, Schema
 
 import graphene
 
 from .types import _Any
+from .utils import field_name_to_type_attribute
 
 
-custom_entities = {}
+def get_entities(schema: Schema) -> Dict[str, Any]:
+    """
+    Find all the entities from the schema.
+    They can be easily distinguished from the other type as
+    the `@key` and `@extend` decorators adds a `_sdl` attribute to them.
+    """
+    entities = {}
+    for type_name, type_ in schema._type_map.items():
+        if not hasattr(type_, "graphene_type"):
+            continue
+        if getattr(type_.graphene_type, "_keys", None):
+            entities[type_name] = type_.graphene_type
+    return entities
 
 
-def register_entity(typename, Type):
-    custom_entities[typename] = Type
+def get_entity_cls(entities: Dict[str, Any]):
+    """
+    Create _Entity type which is a union of all the entities types.
+    """
 
-
-def get_entity_cls():
     class _Entity(Union):
         class Meta:
-            types = tuple(custom_entities.values())
+            types = tuple(entities.values())
+
     return _Entity
 
 
-def get_entity_query(auto_camelcase):
-    if not custom_entities:
+def get_entity_query(schema: Schema):
+    """
+    Create Entity query.
+    """
+    entities_dict = get_entities(schema)
+    if not entities_dict:
         return
 
-    class EntityQuery:
-        entities = graphene.List(get_entity_cls(), name="_entities", representations=List(_Any))
+    entity_type = get_entity_cls(entities_dict)
 
-        def resolve_entities(parent, info, representations):
+    class EntityQuery:
+        entities = graphene.List(
+            entity_type, name="_entities", representations=List(_Any)
+        )
+
+        def resolve_entities(self, info, representations):
             entities = []
             for representation in representations:
-                model = custom_entities[representation["__typename"]]
-                model_aguments = representation.copy()
-                model_aguments.pop("__typename")
-                # todo use schema to identify correct mapping for field names
-                if auto_camelcase:
-                    model_aguments = {to_snake_case(k): v for k, v in model_aguments.items()}
-                model_instance = model(**model_aguments)
+                type_ = schema.get_type(representation["__typename"])
+                model = type_.graphene_type
+                model_arguments = representation.copy()
+                model_arguments.pop("__typename")
+                if schema.auto_camelcase:
+                    get_model_attr = field_name_to_type_attribute(schema, model)
+                    model_arguments = {
+                        get_model_attr(k): v for k, v in model_arguments.items()
+                    }
+                model_instance = model(**model_arguments)
 
-                try:
-                    resolver = getattr(
-                        model, "_%s__resolve_reference" % representation["__typename"])
-                except AttributeError:
-                    pass
-                else:
+                resolver = getattr(
+                    model, "_%s__resolve_reference" % model.__name__, None
+                ) or getattr(model, "_resolve_reference", None)
+                if resolver:
                     model_instance = resolver(model_instance, info)
 
                 entities.append(model_instance)
@@ -53,14 +77,26 @@ def get_entity_query(auto_camelcase):
 
 
 def key(fields: str):
+    """
+    Take as input a field that should be used as key for that entity.
+    See specification: https://www.apollographql.com/docs/federation/federation-spec/#key
+
+    If the input contains a space it means it's a [compound primary key](https://www.apollographql.com/docs/federation/entities/#defining-a-compound-primary-key)
+    which is not yet supported.
+    """
+    if " " in fields:
+        raise NotImplementedError("Compound primary keys are not supported.")
+
     def decorator(Type):
-        register_entity(Type.__name__, Type)
+        # Check the provided fields actually exist on the Type.
+        assert (
+            fields in Type._meta.fields
+        ), f'Field "{fields}" does not exist on type "{Type._meta.name}"'
 
-        existing = getattr(Type, "_sdl", "")
+        keys = getattr(Type, "_keys", [])
+        keys.append(fields)
+        setattr(Type, "_keys", keys)
 
-        key_sdl = f'@key(fields: "{fields}")'
-        updated = f"{key_sdl} {existing}" if existing else key_sdl
-
-        setattr(Type, '_sdl', updated)
         return Type
+
     return decorator

@@ -27,7 +27,7 @@ class FileNode(ObjectType):
 
 
 @key('id')
-@key('primaryEmail')
+@key('primary_email')
 class User(ObjectType):
     id = Int(required=True)
     primary_email = String()
