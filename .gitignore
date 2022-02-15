@@ -1,3 +1,10 @@
+# OS-specific files
+.DS_Store
+
+# IDE
+.idea/
+node_modules
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -103,6 +110,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-
-.idea
-node_modules
