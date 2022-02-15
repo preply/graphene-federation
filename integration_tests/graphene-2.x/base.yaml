@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+
+  service:
+    build: ./service
+    image: graphene_federation/integration-tests/service:graphene-2
+    volumes:
+      - ./service/src:/opt/service
+      - ../../:/opt/lib/graphene_federation
+    command: sh -c "pip install /opt/lib/graphene_federation && uvicorn --host 0.0.0.0 --port 5002 --reload --log-level debug app:app"
+    healthcheck:
+      test: curl http://0.0.0.0:5002/graphql -H "Content-Type:application/json" --data '{"query":"{__schema { types {name} }}"}'
+      interval: 30s
+      timeout: 10s
+      retries: 5

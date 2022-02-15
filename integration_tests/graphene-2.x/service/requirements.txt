@@ -1,0 +1,3 @@
+graphene==2.1.9
+fastapi==0.65.0
+uvicorn>=0.17.4

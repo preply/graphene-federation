@@ -9,6 +9,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Build environment
-      run: make integration-build
+      run: make build.integration-tests
     - name: Run Integration Tests
-      run: make integration-test
+      run: make test.integration

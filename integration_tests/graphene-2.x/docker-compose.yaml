@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+
+  service_a:
+    extends:
+      file: base.yaml
+      service: service
+    environment:
+      - GRAPHENE_FEDERATION_INTEGRATION_TEST_SERVICE=schema_a
+
+  service_b:
+    extends:
+      file: base.yaml
+      service: service
+    environment:
+      - GRAPHENE_FEDERATION_INTEGRATION_TEST_SERVICE=schema_b
+
+  service_c:
+    extends:
+      file: base.yaml
+      service: service
+    environment:
+      - GRAPHENE_FEDERATION_INTEGRATION_TEST_SERVICE=schema_c
+
+  service_d:
+    extends:
+      file: base.yaml
+      service: service
+    environment:
+      - GRAPHENE_FEDERATION_INTEGRATION_TEST_SERVICE=schema_d
+
+  federation:
+    build: federation/.
+    image: graphene_federation/integration-tests/federation:graphene-2
+    volumes:
+      - ./federation/src:/project/src
+    ports:
+      - 3002:3002
+    healthcheck:
+      test: curl -f http://localhost:3002/.well-known/apollo/server-health
+      interval: 3s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      service_a:
+        condition: service_healthy
+      service_b:
+        condition: service_healthy
+      service_c:
+        condition: service_healthy
+      service_d:
+        condition: service_healthy
+
+  proxy_dep:
+    image: busybox
+    depends_on:
+      federation:
+        condition: service_healthy
+
+  test_runner:
+    build: test_runner/.
+    image: graphene_federation/integration-tests/test-runner:graphene-2
+    volumes:
+      - ./test_runner:/project/tests
+    depends_on:
+      - proxy_dep

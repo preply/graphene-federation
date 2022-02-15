@@ -1,5 +1,0 @@
-graphene==3.0.0b7
-graphql-core>=3.1.5
-graphql-server==3.0.0b3
-django>=3.2
-graphene_django>=3.0.0b7
