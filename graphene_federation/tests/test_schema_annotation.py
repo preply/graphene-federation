@@ -253,11 +253,13 @@ def test_user_schema():
     Check that the user schema has been annotated correctly
     and that a request to retrieve a user works.
     """
-    graphql_compatibility.assert_schema_is(actual=user_schema,
-                     # graphene 2.0
-                     expected_2=USER_SCHEMA_2,
-                     # graphene 3.0
-                     expected_3=USER_SCHEMA_3)
+    graphql_compatibility.assert_schema_is(
+        actual=user_schema,
+        # graphene 2.0
+        expected_2=USER_SCHEMA_2,
+        # graphene 3.0
+        expected_3=USER_SCHEMA_3,
+    )
     query = """
     query {
         user(userId: "2") {
@@ -282,7 +284,8 @@ def test_user_schema():
         schema=user_schema,
         actual=result.data["_service"]["sdl"].strip(),
         expected_2=USER_QUERY_RESPONSE_2,
-        expected_3=USER_QUERY_RESPONSE_3)
+        expected_3=USER_QUERY_RESPONSE_3,
+    )
 
 
 def test_chat_schema():
@@ -291,9 +294,7 @@ def test_chat_schema():
     and that a request to retrieve a chat message works.
     """
     graphql_compatibility.assert_schema_is(
-        actual=chat_schema,
-        expected_2=CHAT_SCHEMA_2,
-        expected_3=CHAT_SCHEMA_3
+        actual=chat_schema, expected_2=CHAT_SCHEMA_2, expected_3=CHAT_SCHEMA_3
     )
     query = """
     query {
@@ -320,5 +321,5 @@ def test_chat_schema():
         schema=chat_schema,
         actual=result.data["_service"]["sdl"].strip(),
         expected_2=CHAT_QUERY_RESPONSE_2,
-        expected_3=CHAT_QUERY_RESPONSE_3
+        expected_3=CHAT_QUERY_RESPONSE_3,
     )

@@ -1,22 +1,20 @@
-from typing import Any, Dict, Union
-
-from graphene import List, Union, Schema
-
 import graphene
-
+from typing import Any, Dict, Union
 from . import graphql_compatibility
 from .types import _Any
 from .utils import field_name_to_type_attribute
 
 
-def get_entities(schema: Schema) -> Dict[str, Any]:
+def get_entities(schema: graphene.Schema) -> Dict[str, Any]:
     """
     Find all the entities from the schema.
     They can be easily distinguished from the other type as
     the `@key` and `@extend` decorators adds a `_sdl` attribute to them.
     """
     entities = {}
-    for type_name, type_ in graphql_compatibility.get_type_map_from_schema(schema).items():
+    for type_name, type_ in graphql_compatibility.get_type_map_from_schema(
+        schema
+    ).items():
         if not hasattr(type_, "graphene_type"):
             continue
         if getattr(type_.graphene_type, "_keys", None):
@@ -29,14 +27,14 @@ def get_entity_cls(entities: Dict[str, Any]):
     Create _Entity type which is a union of all the entities types.
     """
 
-    class _Entity(Union):
+    class _Entity(graphene.Union):
         class Meta:
             types = tuple(entities.values())
 
     return _Entity
 
 
-def get_entity_query(schema: Schema):
+def get_entity_query(schema: graphene.Schema):
     """
     Create Entity query.
     """
@@ -48,14 +46,16 @@ def get_entity_query(schema: Schema):
 
     class EntityQuery:
         entities = graphene.List(
-            entity_type, name="_entities", representations=List(_Any)
+            entity_type, name="_entities", representations=graphene.List(_Any)
         )
 
         def resolve_entities(self, info, representations):
             entities = []
             for representation in representations:
                 # old type_ = schema.get_type(representation["__typename"])
-                type_ = graphql_compatibility.call_schema_get_type(schema, representation["__typename"])
+                type_ = graphql_compatibility.call_schema_get_type(
+                    schema, representation["__typename"]
+                )
                 model = type_.graphene_type
                 model_arguments = representation.copy()
                 model_arguments.pop("__typename")

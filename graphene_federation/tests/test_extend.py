@@ -1,7 +1,5 @@
 import pytest
-
 from graphene import ObjectType, ID, String
-
 from ..extend import extend
 
 

@@ -12,7 +12,9 @@ def get_extended_types(schema: Schema) -> Dict[str, Any]:
     the `@extend` decorator adds a `_extended` attribute to them.
     """
     extended_types = {}
-    for type_name, type_ in graphql_compatibility.get_type_map_from_schema(schema).items():
+    for type_name, type_ in graphql_compatibility.get_type_map_from_schema(
+        schema
+    ).items():
         if not hasattr(type_, "graphene_type"):
             continue
         if getattr(type_.graphene_type, "_extended", False):
@@ -35,7 +37,8 @@ def extend(fields: str):
             fields in Type._meta.fields
         ), f'Field "{fields}" does not exist on type "{Type._meta.name}"'
         if hasattr(Type._meta, "description") and Type._meta.description is not None:
-            raise ValueError(f"""{Type.__name__} has a non empty description and it is also marked with extend. 
+            raise ValueError(
+                f"""{Type.__name__} has a non empty description and it is also marked with extend. 
                 They are mututally exclusive. 
                 See https://github.com/graphql/graphql-js/issues/2385#issuecomment-577997521"""
             )

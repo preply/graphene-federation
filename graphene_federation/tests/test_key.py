@@ -1,9 +1,6 @@
 import pytest
-
 from graphql import graphql
-
 from graphene import ObjectType, ID, String, Field
-
 from .. import graphql_compatibility
 from ..entity import key
 from ..main import build_schema
@@ -78,6 +75,7 @@ type User @key(fields: "email") @key(fields: "identifier") {
   email: String
 }
 """
+
 
 def test_multiple_keys():
     @key("identifier")

@@ -424,6 +424,7 @@ type Potato @key(fields: "id") {
 }
 """
 
+
 def test_similar_field_name():
     """
     Test annotation with fields that have similar names.

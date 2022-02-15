@@ -235,6 +235,7 @@ extend type Acme  @key(fields: "id") {
 }
 """
 
+
 def test_chain_requires_failure():
     """
     Check that we can't nest call the requires method on a field.

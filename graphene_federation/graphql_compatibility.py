@@ -28,10 +28,12 @@ def perform_graphql_query(schema: Schema, query: str):
     major = get_graphene_version(schema)
     if major == 2:
         from graphql import graphql
+
         result = graphql(schema, query)
         return result
     elif major == 3:
         from graphql import graphql_sync
+
         result = graphql_sync(schema.graphql_schema, query)
         return result
     else:
@@ -42,19 +44,29 @@ def assert_schema_is(actual: Schema, expected_2: str, expected_3: str):
     major = get_graphene_version(actual)
     actual_str = get_schema_str(actual)
     if major == 2:
-        assert actual_str == expected_2, f"\n{actual_str}\n!=\n{expected_2}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual_str.strip(), expected_2.strip()))))}"
+        assert (
+            actual_str == expected_2
+        ), f"\n{actual_str}\n!=\n{expected_2}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual_str.strip(), expected_2.strip()))))}"
     elif major == 3:
-        assert actual_str == expected_3, f"\n{actual_str}\n!=\n{expected_3}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual_str.strip(), expected_3.strip()))))}"
+        assert (
+            actual_str == expected_3
+        ), f"\n{actual_str}\n!=\n{expected_3}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual_str.strip(), expected_3.strip()))))}"
     else:
         assert False, f"invalid major version {major}"
 
 
-def assert_graphql_response_data(schema: Schema, actual: str, expected_2: str, expected_3: str):
+def assert_graphql_response_data(
+    schema: Schema, actual: str, expected_2: str, expected_3: str
+):
     major = get_graphene_version(schema)
     if major == 2:
-        assert actual.strip() == expected_2.strip(), f"\n{actual.strip()}\n!=\n{expected_2.strip()}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual.strip(), expected_3.strip()))))}"
+        assert (
+            actual.strip() == expected_2.strip()
+        ), f"\n{actual.strip()}\n!=\n{expected_2.strip()}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual.strip(), expected_3.strip()))))}"
     elif major == 3:
-        assert actual.strip() == expected_3.strip(), f"\n{actual.strip()}\n!=\n{expected_3.strip()}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual.strip(), expected_3.strip()))))}"
+        assert (
+            actual.strip() == expected_3.strip()
+        ), f"\n{actual.strip()}\n!=\n{expected_3.strip()}\nDIFFERENCES: {list(filter(lambda x: x[1][0] != x[1][1], enumerate(zip(actual.strip(), expected_3.strip()))))}"
     else:
         raise ValueError(f"invalid graphene major version {major}")
 
@@ -62,16 +74,25 @@ def assert_graphql_response_data(schema: Schema, actual: str, expected_2: str, e
 def call_schema_print_fields(schema: Schema, t: type) -> Dict[str, any]:
     major = get_graphene_version(schema)
     if major == 2:
-        from graphql.utils.schema_printer import _print_fields as print_fields, _print_args, _print_deprecated
+        from graphql.utils.schema_printer import (
+            _print_fields as print_fields,
+            _print_args,
+            _print_deprecated,
+        )
 
         # TODO remove
         # def _print_fields_copy(type: Union["GraphQLObjectType", "GraphQLInterfaceType"]) -> str:
         #     return "\n".join(f"  {f_name}{_print_args(f)}: {f.type}{_print_deprecated(f)}" for f_name, f in type.fields.items())
-        #return _print_fields_copy(t)
-        return print_fields(t) # yields ' userId: ID!\n '
+        # return _print_fields_copy(t)
+        return print_fields(t)  # yields ' userId: ID!\n '
 
     elif major == 3:
-        from graphql.utilities.print_schema import print_fields, print_description, print_args, print_deprecated
+        from graphql.utilities.print_schema import (
+            print_fields,
+            print_description,
+            print_args,
+            print_deprecated,
+        )
 
         # copy of print_fields from graphene 3.0.0 where we avoid calling print_blocks
         def print_fields_compliant(_type: any):
@@ -90,13 +111,18 @@ def call_schema_print_fields(schema: Schema, t: type) -> Dict[str, any]:
         raise ValueError(f"invalid graphene major version {major}")
 
 
-
 def get_schema_str(schema: Schema) -> str:
     major = get_graphene_version(schema)
     if major == 2:
         return str(schema)
     elif major == 3:
-        from graphql.utilities.print_schema import print_schema, print_schema_definition, print_directive, print_type, print_introspection_schema
+        from graphql.utilities.print_schema import (
+            print_schema,
+            print_schema_definition,
+            print_directive,
+            print_type,
+            print_introspection_schema,
+        )
         from graphql.utilities.print_schema import print_schema_definition
 
         def print_schema_definition_forced(schema: "GraphQLSchema") -> Optional[str]:
@@ -117,7 +143,11 @@ def get_schema_str(schema: Schema) -> str:
 
             return "schema {\n" + "\n".join(operation_types) + "\n}"
 
-        result = print_schema_definition_forced(schema.graphql_schema) + "\n\n" + print_schema(schema.graphql_schema)
+        result = (
+            print_schema_definition_forced(schema.graphql_schema)
+            + "\n\n"
+            + print_schema(schema.graphql_schema)
+        )
         return result
     else:
         raise ValueError(f"invalid graphene major version {major}")
@@ -158,6 +188,7 @@ def is_schema_in_auto_camelcase(schema: Schema) -> bool:
             return True
     else:
         raise ValueError(f"invalid graphene major version {major}")
+
 
 # def print_fields(type_: Union[GraphQLObjectType, GraphQLInterfaceType]) -> str:
 #     try:

@@ -52,7 +52,9 @@ def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> 
     str_fields = []
     get_model_attr = field_name_to_type_attribute(schema, entity)
     for field_name, field in entity_type.fields.items():
-        str_field = graphql_compatibility.call_schema_print_fields(schema, MonoFieldType(field_name, field))
+        str_field = graphql_compatibility.call_schema_print_fields(
+            schema, MonoFieldType(field_name, field)
+        )
         # Check if we need to annotate the field by checking if it has the decorator attribute set on the field.
         f = getattr(entity, get_model_attr(field_name), None)
         if f is not None:
@@ -63,7 +65,9 @@ def add_entity_fields_decorators(entity, schema: Schema, string_schema: str) -> 
         str_fields.append(str_field)
     str_fields_annotated = "\n".join(str_fields)
     # Replace the original field declaration by the annotated one
-    str_fields_original = graphql_compatibility.call_schema_print_fields(schema, entity_type)
+    str_fields_original = graphql_compatibility.call_schema_print_fields(
+        schema, entity_type
+    )
     pattern = re.compile(
         r"(type\s%s\s[^\{]*)\{\s*%s\s*\}"
         % (entity_name, re.escape(str_fields_original))
