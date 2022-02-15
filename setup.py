@@ -1,11 +1,16 @@
+# -*- coding: utf-8 -*-
+
 import os
 from setuptools import find_packages, setup
 
+from graphene_federation import version
+
 
 def read(*rnames):
-  return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
-
-version = '0.1.0'
+  """
+  Read content of a file. We assume the file to be in utf8
+  """
+  return open(os.path.join(os.path.dirname(__file__), *rnames), encoding="utf8", mode="r").read()
 
 tests_require = [
     "pytest==6.1.1",
@@ -20,18 +25,18 @@ dev_require = [
 setup(
   name='graphene-federation',
   packages=find_packages(exclude=["tests"]),
-  version=version,
+  version=version.VERSION,
   license='MIT',
-  description = 'Federation implementation for graphene',
+  description='Federation implementation for graphene',
   long_description=(read('README.md')),
   long_description_content_type='text/markdown',
   author='Igor Kasianov',
   author_email='super.hang.glider@gmail.com',
   url='https://github.com/preply/graphene-federation',
-  download_url=f'https://github.com/preply/graphene-federation/archive/{version}.tar.gz',
+  download_url=f'https://github.com/preply/graphene-federation/archive/{version.VERSION}.tar.gz',
   keywords=["graphene", "graphql", "gql", "federation"],
   install_requires=[
-    "graphene>=2.1.0,<3"
+    "graphene>=2.1.0"
   ],
   classifiers=[
     "Development Status :: 5 - Production/Stable",

@@ -1,7 +1,8 @@
 from graphql import graphql
 
-from graphene import ObjectType, ID, String, NonNull, Field
+from graphene import ObjectType, ID, String, NonNull, Field, Schema
 
+from .. import graphql_compatibility
 from ..entity import key
 from ..extend import extend, external
 from ..main import build_schema
@@ -77,19 +78,12 @@ class ChatQuery(ObjectType):
 
 chat_schema = build_schema(query=ChatQuery)
 
+
 # ------------------------
 # Tests
 # ------------------------
 
-
-def test_user_schema():
-    """
-    Check that the user schema has been annotated correctly
-    and that a request to retrieve a user works.
-    """
-    assert (
-        str(user_schema)
-        == """schema {
+USER_SCHEMA_2 = """schema {
   query: Query
 }
 
@@ -113,31 +107,33 @@ type _Service {
   sdl: String
 }
 """
-    )
-    query = """
-    query {
-        user(userId: "2") {
-            name
-        }
-    }
-    """
-    result = graphql(user_schema, query)
-    assert not result.errors
-    assert result.data == {"user": {"name": "Jack"}}
-    # Check the federation service schema definition language
-    query = """
-    query {
-        _service {
-            sdl
-        }
-    }
-    """
-    result = graphql(user_schema, query)
-    assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
-type User @key(fields: "email") @key(fields: "userId") {
+USER_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  user(userId: ID!): User
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type User {
+  userId: ID!
+  email: String!
+  name: String
+}
+
+union _Entity = User
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+
+USER_QUERY_RESPONSE_2 = """type User @key(fields: "email") @key(fields: "userId") {
   userId: ID!
   email: String!
   name: String
@@ -146,18 +142,19 @@ type User @key(fields: "email") @key(fields: "userId") {
 type UserQuery {
   user(userId: ID!): User
 }
-""".strip()
-    )
+"""
+USER_QUERY_RESPONSE_3 = """type UserQuery {
+  user(userId: ID!): User
+}
 
+type User @key(fields: "email") @key(fields: "userId") {
+  userId: ID!
+  email: String!
+  name: String
+}
+"""
 
-def test_chat_schema():
-    """
-    Check that the chat schema has been annotated correctly
-    and that a request to retrieve a chat message works.
-    """
-    assert (
-        str(chat_schema)
-        == """schema {
+CHAT_SCHEMA_2 = """schema {
   query: Query
 }
 
@@ -186,31 +183,38 @@ type _Service {
   sdl: String
 }
 """
-    )
-    query = """
-    query {
-        message(id: "4") {
-            text
-            userId
-        }
-    }
-    """
-    result = graphql(chat_schema, query)
-    assert not result.errors
-    assert result.data == {"message": {"text": "Don't be rude Jack", "userId": "3"}}
-    # Check the federation service schema definition language
-    query = """
-    query {
-        _service {
-            sdl
-        }
-    }
-    """
-    result = graphql(chat_schema, query)
-    assert not result.errors
-    assert (
-        result.data["_service"]["sdl"].strip()
-        == """
+CHAT_SCHEMA_3 = """schema {
+  query: Query
+}
+
+type Query {
+  message(id: ID!): ChatMessage
+  _entities(representations: [_Any] = null): [_Entity]
+  _service: _Service
+}
+
+type ChatMessage {
+  id: ID!
+  text: String
+  userId: ID
+  user: ChatUser!
+}
+
+type ChatUser {
+  userId: ID!
+}
+
+union _Entity = ChatUser
+
+\"\"\"Anything\"\"\"
+scalar _Any
+
+type _Service {
+  sdl: String
+}
+"""
+
+CHAT_QUERY_RESPONSE_2 = """
 type ChatMessage {
   id: ID!
   text: String
@@ -225,5 +229,96 @@ type ChatQuery {
 extend type ChatUser  @key(fields: "userId") {
   userId: ID! @external
 }
-""".strip()
+"""
+CHAT_QUERY_RESPONSE_3 = """
+type ChatQuery {
+  message(id: ID!): ChatMessage
+}
+
+type ChatMessage {
+  id: ID!
+  text: String
+  userId: ID
+  user: ChatUser!
+}
+
+extend type ChatUser  @key(fields: "userId") {
+  userId: ID! @external
+}
+"""
+
+
+def test_user_schema():
+    """
+    Check that the user schema has been annotated correctly
+    and that a request to retrieve a user works.
+    """
+    graphql_compatibility.assert_schema_is(actual=user_schema,
+                     # graphene 2.0
+                     expected_2=USER_SCHEMA_2,
+                     # graphene 3.0
+                     expected_3=USER_SCHEMA_3)
+    query = """
+    query {
+        user(userId: "2") {
+            name
+        }
+    }
+    """
+    result = graphql_compatibility.perform_graphql_query(user_schema, query)
+    assert not result.errors
+    assert result.data == {"user": {"name": "Jack"}}
+    # Check the federation service schema definition language
+    query = """
+    query {
+        _service {
+            sdl
+        }
+    }
+    """
+    result = graphql_compatibility.perform_graphql_query(user_schema, query)
+    assert not result.errors
+    graphql_compatibility.assert_graphql_response_data(
+        schema=user_schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=USER_QUERY_RESPONSE_2,
+        expected_3=USER_QUERY_RESPONSE_3)
+
+
+def test_chat_schema():
+    """
+    Check that the chat schema has been annotated correctly
+    and that a request to retrieve a chat message works.
+    """
+    graphql_compatibility.assert_schema_is(
+        actual=chat_schema,
+        expected_2=CHAT_SCHEMA_2,
+        expected_3=CHAT_SCHEMA_3
+    )
+    query = """
+    query {
+        message(id: "4") {
+            text
+            userId
+        }
+    }
+    """
+    result = graphql_compatibility.perform_graphql_query(chat_schema, query)
+    assert not result.errors
+    assert result.data == {"message": {"text": "Don't be rude Jack", "userId": "3"}}
+    # Check the federation service schema definition language
+    query = """
+    query {
+        _service {
+            sdl
+        }
+    }
+    """
+    result = graphql_compatibility.perform_graphql_query(chat_schema, query)
+    assert not result.errors
+    graphql_compatibility.assert_graphql_response_data(
+        schema=chat_schema,
+        actual=result.data["_service"]["sdl"].strip(),
+        expected_2=CHAT_QUERY_RESPONSE_2,
+        expected_3=CHAT_QUERY_RESPONSE_3
     )

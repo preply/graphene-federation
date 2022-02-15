@@ -1,6 +1,15 @@
 import json
 import requests
 
+TEST_3: bool = True
+
+SERVICE_A = "service_3_a" if TEST_3 else "service_a"
+SERVICE_B = "service_3_b" if TEST_3 else "service_b"
+SERVICE_C = "service_3_c" if TEST_3 else "service_c"
+SERVICE_D = "service_3_d" if TEST_3 else "service_d"
+GRAPHQL_SERVER_PORT = 5003 if TEST_3 else 5000
+GATEWAY_NAME = "federation_3" if TEST_3 else "federation"
+GATEWAY_PORT = 3003 if TEST_3 else 3000
 
 def test_integrate_simple_schema():
     query = {
@@ -11,10 +20,11 @@ def test_integrate_simple_schema():
         """,
         'variables': {}
     }
-    response = requests.post('http://federation:3000/graphql/', json=query)
+    response = requests.post(f'http://{GATEWAY_NAME}federation:{GATEWAY_PORT}/graphql/', json=query)
     assert response.status_code == 200
     data = json.loads(response.content)['data']
     assert data['goodbye'] == 'See ya!'
+    print("qwerty")
 
 
 def test_external_types():
@@ -50,7 +60,7 @@ def test_external_types():
         'variables': {}
     }
     response = requests.post(
-        'http://federation:3000/graphql/',
+        f'http://{GATEWAY_NAME}:{GATEWAY_PORT}/graphql/',
         json=query,
     )
     assert response.status_code == 200
@@ -71,7 +81,7 @@ def test_external_types():
         {'id': 1, 'text': 'some text', 'author': {'id': 5, 'primaryEmail': 'name_5@gmail.com'}}]
 
 
-def fetch_sdl(service_name='service_b'):
+def fetch_sdl(service_name: str):
     query = {
         'query': """
             query {
@@ -82,13 +92,13 @@ def fetch_sdl(service_name='service_b'):
         """,
         'variables': {}
     }
-    response = requests.post(f'http://{service_name}:5000/graphql', json=query)
+    response = requests.post(f'http://{service_name}:{GRAPHQL_SERVER_PORT}/graphql/', json=query)
     assert response.status_code == 200
     return response.json()['data']['_service']['sdl']
 
 
 def test_key_decorator_applied_by_exact_match_only():
-    sdl = fetch_sdl()
+    sdl = fetch_sdl(SERVICE_B)
     assert 'type FileNode @key(fields: "id")' in sdl
     assert 'type FileNodeAnother @key(fields: "id")' not in sdl
 
@@ -103,7 +113,7 @@ def test_mutation_is_accessible_in_federation():
     }"""
 
     response = requests.post(
-        'http://federation:3000/graphql/', json={'query': mutation}
+        f'http://{GATEWAY_NAME}:{GATEWAY_PORT}/graphql/', json={'query': mutation}
     )
     assert response.status_code == 200
     assert 'errors' not in response.json()
@@ -111,12 +121,12 @@ def test_mutation_is_accessible_in_federation():
 
 
 def test_multiple_key_decorators_apply_multiple_key_annotations():
-    sdl = fetch_sdl()
+    sdl = fetch_sdl(SERVICE_B)
     assert 'type User @key(fields: "primaryEmail") @key(fields: "id")' in sdl
 
 
 def test_avoid_duplication_of_key_decorator():
-    sdl = fetch_sdl('service_a')
+    sdl = fetch_sdl(SERVICE_A)
     assert 'extend type FileNode  @key(fields: \"id\") {' in sdl
 
 
@@ -136,7 +146,7 @@ def test_requires():
         'variables': {}
     }
     response = requests.post(
-        'http://federation:3000/graphql/',
+        f'http://{GATEWAY_NAME}:{GATEWAY_PORT}/graphql/',
         json=query,
     )
     assert response.status_code == 200
@@ -176,7 +186,7 @@ def test_provides():
         'variables': {}
     }
     response = requests.post(
-        'http://federation:3000/graphql/',
+        f'http://{GATEWAY_NAME}:{GATEWAY_PORT}/graphql/',
         json=query,
     )
     assert response.status_code == 200

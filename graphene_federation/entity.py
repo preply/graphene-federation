@@ -4,6 +4,7 @@ from graphene import List, Union, Schema
 
 import graphene
 
+from . import graphql_compatibility
 from .types import _Any
 from .utils import field_name_to_type_attribute
 
@@ -15,7 +16,7 @@ def get_entities(schema: Schema) -> Dict[str, Any]:
     the `@key` and `@extend` decorators adds a `_sdl` attribute to them.
     """
     entities = {}
-    for type_name, type_ in schema._type_map.items():
+    for type_name, type_ in graphql_compatibility.get_type_map_from_schema(schema).items():
         if not hasattr(type_, "graphene_type"):
             continue
         if getattr(type_.graphene_type, "_keys", None):
@@ -53,11 +54,12 @@ def get_entity_query(schema: Schema):
         def resolve_entities(self, info, representations):
             entities = []
             for representation in representations:
-                type_ = schema.get_type(representation["__typename"])
+                # old type_ = schema.get_type(representation["__typename"])
+                type_ = graphql_compatibility.call_schema_get_type(schema, representation["__typename"])
                 model = type_.graphene_type
                 model_arguments = representation.copy()
                 model_arguments.pop("__typename")
-                if schema.auto_camelcase:
+                if graphql_compatibility.is_schema_in_auto_camelcase(schema):
                     get_model_attr = field_name_to_type_attribute(schema, model)
                     model_arguments = {
                         get_model_attr(k): v for k, v in model_arguments.items()
