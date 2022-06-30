@@ -47,7 +47,6 @@ def _mark_provides(entity_name, entity, schema, auto_camelcase):
 
 def get_sdl(schema, custom_entities):
     string_schema = str(schema)
-    string_schema = string_schema.replace("\n", " ")
 
     regex = r"schema \{(\w|\!|\s|\:)*\}"
     pattern = re.compile(regex)
