@@ -20,6 +20,9 @@ setup(
   url = 'https://github.com/preply/graphene-federation',
   download_url = f'https://github.com/preply/graphene-federation/archive/{version}.tar.gz',
   keywords = ['graphene', 'gql', 'federation'],
+  install_requires=[
+        "graphene>=3,<4"
+  ],
   classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
