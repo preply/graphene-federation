@@ -23,7 +23,7 @@ jobs:
 
       - name: Install pipenv
         run: |
-          pip install pipenv==2022.5.2
+          pip install pipenv
       - name: Install environment
         run: pipenv install --system --deploy --ignore-pipfile --dev
 
