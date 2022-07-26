@@ -1,0 +1,24 @@
+name: Tests
+on: [pull_request]
+jobs:
+  Run-Unit-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 # Checking out the repo
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+            python-version: "3.6"
+            architecture: x64
+
+      - name: Install pipenv
+        run: |
+          pip install pipenv==2022.4.8
+      - name: Install environment
+        run: pipenv install --system --deploy --ignore-pipfile --dev
+
+      - name: Run Unit Tests
+        run: |
+          make unittest
+      - run: echo "🍏 This job's status is ${{ job.status }}."
