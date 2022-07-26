@@ -3,16 +3,29 @@ on: [push]
 jobs:
   Run-Unit-Tests:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./graphene_federation
+#    defaults:
+#      run:
+#        working-directory: ./graphene_federation
     steps:
       - uses: actions/checkout@v2 # Checking out the repo
 
-      - name: Install dependecies
-        uses: VaultVulp/action-pipenv@v2.0.1
+      - name: Setup Python
+        uses: actions/setup-python@v3
         with:
-          command: install -d # Install all dependencies, including development ones
+            python-version: "3.6"
+            architecture: x64
+
+      - uses: actions/cache@v3
+        id: pip-cache
+        with:
+            path: ${{ env.pythonLocation }}
+            key: ${{ env.pythonLocation }}-pip-${{ hashFiles('**/Pipfile') }}
+
+      - name: Install pipenv
+        run: |
+          pip install pipenv==2022.5.2
+      - name: Install environment
+        run: pipenv install --system --deploy --ignore-pipfile --dev
 
       - name: Run Unit Tests
         run: |
