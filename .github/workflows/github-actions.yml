@@ -15,15 +15,15 @@ jobs:
             python-version: "3.6"
             architecture: x64
 
-      - uses: actions/cache@v3
-        id: pip-cache
-        with:
-            path: ${{ env.pythonLocation }}
-            key: ${{ env.pythonLocation }}-pip-${{ hashFiles('**/Pipfile') }}
+#      - uses: actions/cache@v3
+#        id: pip-cache
+#        with:
+#            path: ${{ env.pythonLocation }}
+#            key: ${{ env.pythonLocation }}-pip-${{ hashFiles('**/Pipfile') }}
 
       - name: Install pipenv
         run: |
-          pip install pipenv
+          pip install pipenv==2022.4.8
       - name: Install environment
         run: pipenv install --system --deploy --ignore-pipfile --dev
 
