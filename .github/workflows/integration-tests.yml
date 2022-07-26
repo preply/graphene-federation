@@ -1,0 +1,15 @@
+name: Tests
+on: [pull_request]
+jobs:
+  Run-Integration-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 # Checking out the repo
+
+      - name: Run Build
+        run: |
+          make build
+      - name: Run tests
+        run: |
+          make test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
