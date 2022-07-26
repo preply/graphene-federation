@@ -1,11 +1,11 @@
 name: Tests
-on: [push]
+on:
+  pull_request:
+    paths:
+      - "*"
 jobs:
   Run-Unit-Tests:
     runs-on: ubuntu-latest
-#    defaults:
-#      run:
-#        working-directory: ./graphene_federation
     steps:
       - uses: actions/checkout@v2 # Checking out the repo
 
@@ -14,12 +14,6 @@ jobs:
         with:
             python-version: "3.6"
             architecture: x64
-
-#      - uses: actions/cache@v3
-#        id: pip-cache
-#        with:
-#            path: ${{ env.pythonLocation }}
-#            key: ${{ env.pythonLocation }}-pip-${{ hashFiles('**/Pipfile') }}
 
       - name: Install pipenv
         run: |
