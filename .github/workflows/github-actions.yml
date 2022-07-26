@@ -3,6 +3,9 @@ on: [push]
 jobs:
   Run-Unit-Tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./graphene_federation
     steps:
       - uses: actions/checkout@v2 # Checking out the repo
 
