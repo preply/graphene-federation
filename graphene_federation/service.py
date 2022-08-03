@@ -1,4 +1,5 @@
 import re
+import typing as t
 
 from graphene import ObjectType, String, Field
 from graphene.utils.str_converters import to_camel_case
@@ -10,7 +11,7 @@ from .entity import custom_entities
 
 def _mark_field(
         entity_name, entity, schema: str, mark_attr_name: str,
-        decorator_resolver: callable, auto_camelcase: bool
+        decorator_resolver: t.Callable, auto_camelcase: bool
 ):
     for field_name in dir(entity):
         field = getattr(entity, field_name, None)
