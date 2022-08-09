@@ -1,4 +1,4 @@
-FROM python:3.6-alpine3.9
+FROM python:3.10-alpine
 
 WORKDIR project
 RUN apk add curl
