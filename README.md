@@ -1,4 +1,7 @@
 # graphene-federation
+
+# This repository is archived. Further development is going at [graphql-python/graphene-federation](https://github.com/graphql-python/graphene-federation)
+
 Federation support for graphene
 
 Build: [![CircleCI](https://circleci.com/gh/preply/graphene-federation.svg?style=svg)](https://circleci.com/gh/preply/graphene-federation)
